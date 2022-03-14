@@ -9,6 +9,6 @@ class t_profils extends Model
 {
     use HasFactory;
 
-    private $primaryKey = 'r_i';
-    private $table = 't_profils';
+    protected $primaryKey = 'r_i';
+    protected $table = 't_profils';
 }
