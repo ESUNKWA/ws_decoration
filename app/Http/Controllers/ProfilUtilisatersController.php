@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Validator;
 class ProfilUtilisatersController extends Controller
 {
     public function index(){
-        $liste_profil = t_profils::all();
+        $liste_profil = t_profils::orderBy('r_libelle', 'ASC')->get();
         $datas = [
             '_status' => 1,
-            'result' => $liste_profil
+            '_result' => $liste_profil
         ];
         return $datas;
     }

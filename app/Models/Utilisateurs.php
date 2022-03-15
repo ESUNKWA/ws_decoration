@@ -9,6 +9,7 @@ class Utilisateurs extends Model
 {
     use HasFactory;
     protected $primaryKey = 'r_i';
-    private $table = 't_utilisateurs';
+    protected $table = 't_utilisateurs';
+    protected $fillable = ['r_profil','r_nom','r_prenoms','r_telephone','r_login','password','r_photo','r_profil','r_status'];
 
 }
