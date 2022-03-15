@@ -89,7 +89,11 @@ class utilisateursController extends Controller
                 'r_photo'   => $request->p_img_name,
                 'r_status'  => 1,
             ]);
-
+            $response = [
+                '_status' => 1,
+                '_result' => 'Enregistrement effectué avec succès',
+            ];
+            return response()->json($response, 200);
         }
     }
 
@@ -122,9 +126,48 @@ class utilisateursController extends Controller
      * @param  \App\Models\rc  $rc
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, rc $rc)
+    public function update(Request $request, $id)
     {
-        //
+        $inputs = $request->all();
+
+        // Validation des champs
+        $errors = [
+            'p_profil'  => 'required',
+            'p_nom'  => 'required|between:2,20',
+            'p_prenoms'  => 'required|between:2,30',
+            'r_telephone'  => 'required|unique:t_utilisateurs'
+        ];
+
+        $erreurs = [
+            'p_profil.required'  => 'Le profil est réquis',
+            'p_nom.required'  => 'Le nom est réquis',
+            'p_nom.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
+            'p_prenoms.required'  => 'le nom est réquis',
+            'p_prenoms.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
+            'r_telephone.required'  => 'Le numéro de téléphone est réquis',
+            'r_telephone.unique'  => 'Le numéro de téléphone existe déjà',
+        ];
+
+        $validate = Validator::make($inputs, $errors, $erreurs);
+
+        if( $validate->fails() ){
+            return $validate->errors();
+        }else{
+            $utilisateur = Utilisateurs::find($id);
+            $utilisateur->update([
+                'r_profil' => $request->p_profil,
+                'r_nom' => $request->p_nom,
+                'r_prenoms'=>   $request->p_prenoms,
+                'r_telephone'   => $request->r_telephone,
+                'r_status'  => 1,
+            ]);
+
+            $response = [
+                '_status' => 1,
+                '_result' => 'Modification effectuée avec succès',
+            ];
+            return response()->json($response, 200);
+        }
     }
 
     /**
