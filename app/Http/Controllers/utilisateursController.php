@@ -31,7 +31,7 @@ class utilisateursController extends Controller
      */
     public function create()
     {
-        
+
     }
 
     /**
@@ -49,6 +49,7 @@ class utilisateursController extends Controller
             'p_profil'  => 'required',
             'p_nom'  => 'required|between:2,20',
             'p_prenoms'  => 'required|between:2,30',
+            'p_telephone '  => 'required',
             'r_login'  => 'required|min:4',
             'password'  => 'required|min:4|confirmed'
         ];
@@ -59,6 +60,7 @@ class utilisateursController extends Controller
             'p_nom.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
             'p_prenoms.required'  => 'le nom est réquis',
             'p_prenoms.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
+            'p_telephone.required'  => 'Le numéro de téléphone est réquis',
             'r_login.required'  => 'L\'identifiant est obligatoire',
             'r_login.min'       => 'L\'identifiant doit avoir au minimum 4 caractères',
             'password.required' => 'Le mot de passe est réquis',
@@ -78,7 +80,7 @@ class utilisateursController extends Controller
                 'r_prenoms'=>   $request->p_prenoms,
                 'r_telephone'   => $request->r_telephone,
                 'r_login' => $request->r_login,
-                'password' => MD5($request->password), 
+                'password' => MD5($request->password),
                 'r_photo'   => $request->p_img_name,
                 'r_status'  => 1,
             ]);
