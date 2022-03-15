@@ -49,8 +49,8 @@ class utilisateursController extends Controller
             'p_profil'  => 'required',
             'p_nom'  => 'required|between:2,20',
             'p_prenoms'  => 'required|between:2,30',
-            'p_telephone '  => 'required',
-            'r_login'  => 'required|min:4',
+            'r_telephone'  => 'required|unique:t_utilisateurs',
+            'r_login'  => 'required|min:4|unique:t_utilisateurs',
             'password'  => 'required|min:4|confirmed'
         ];
 
@@ -60,15 +60,20 @@ class utilisateursController extends Controller
             'p_nom.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
             'p_prenoms.required'  => 'le nom est réquis',
             'p_prenoms.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
-            'p_telephone.required'  => 'Le numéro de téléphone est réquis',
+            'r_telephone.required'  => 'Le numéro de téléphone est réquis',
+            'r_telephone.unique'  => 'Le numéro de téléphone déjà existant',
             'r_login.required'  => 'L\'identifiant est obligatoire',
             'r_login.min'       => 'L\'identifiant doit avoir au minimum 4 caractères',
+            'r_login.unique'       => 'Login déjà existant',
             'password.required' => 'Le mot de passe est réquis',
             'password.min' => 'Le mot de passe doit être de 4 caractères minimum',
             'password_confirmation.required' => 'Confirmer le mot de passe',
+            'password.confirmed' => 'Les mots de passes ne correspondent pas',
         ];
 
         $validate = Validator::make($inputs, $errors, $erreurs);
+
+
 
         if( $validate->fails() ){
             return $validate->errors();
