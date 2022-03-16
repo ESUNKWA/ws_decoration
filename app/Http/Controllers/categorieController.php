@@ -61,7 +61,7 @@ class categorieController extends Controller
         if( $validate->fails()){
             return $validate->errors();
         }else{
-            $insert = Categories::create([
+            $insertion = Categories::create([
                 'r_libelle' => $request->r_libelle,
                 'p_description' => $request->p_description,
                 'r_utilisateur' => $request->p_utilisateur,
@@ -70,7 +70,7 @@ class categorieController extends Controller
 
             $response = [
                 '_status' => 1,
-                '_result' => 'Enregistrement effectué avec succès',
+                '_result' => 'La catégorie [ '.$insertion->r_libelle.' ] à bien été enregistrée'
             ];
             return response()->json($response, 200);
         }

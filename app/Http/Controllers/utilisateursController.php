@@ -91,7 +91,7 @@ class utilisateursController extends Controller
             ]);
             $response = [
                 '_status' => 1,
-                '_result' => 'Enregistrement effectué avec succès',
+                '_result' => 'L\'utilisateur [ '.$insertion->r_nom.' ] à bien été enregistré(e)',
             ];
             return response()->json($response, 200);
         }
