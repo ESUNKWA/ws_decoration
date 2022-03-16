@@ -105,9 +105,41 @@ class categorieController extends Controller
      * @param  \App\Models\rc  $rc
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, rc $rc)
+    public function update(Request $request, $id)
     {
-        //
+        $inputs = $request->all();
+
+        // Validation des champs
+        $errors = [
+            'r_libelle'  => 'required',
+            'p_utilisateur' => 'required'
+        ];
+        $erreurs = [
+            'r_libelle.required' =>'Le libellé est obligatoire',
+            'p_utilisateur.required'  => 'Veuillez préciser l\'utilisateur'
+        ];
+
+        $validate = Validator::make($inputs, $errors, $erreurs);
+
+        if( $validate->fails()){
+            return $validate->errors();
+        }else{
+
+            $update = Categories::find($id);
+
+            $update->update([
+                'r_libelle' => $request->r_libelle,
+                'r_description' => $request->p_description,
+                'r_utilisateur' => $request->p_utilisateur,
+                'r_status' => $request->p_status,
+            ]);
+
+            $response = [
+                '_status' => 1,
+                '_result' => 'La catégorie [ '.$update->r_libelle.' ] à bien été modifiée'
+            ];
+            return response()->json($response, 200);
+        }
     }
 
     /**
