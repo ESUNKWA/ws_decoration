@@ -18,7 +18,7 @@ class ProfilUtilisatersController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $inputs = $request->all();//Récupère tous champs du formulaire
 
         $errors = [
