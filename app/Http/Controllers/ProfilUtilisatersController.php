@@ -17,7 +17,7 @@ class ProfilUtilisatersController extends Controller
         return $datas;
     }
 
-    public function create(Request $request){
+    public function store(Request $request){
 
         $inputs = $request->all();//Récupère tous champs du formulaire
 
