@@ -59,11 +59,15 @@ class categorieController extends Controller
         $validate = Validator::make($inputs, $errors, $erreurs);
 
         if( $validate->fails()){
-            return $validate->errors();
+            $response = [
+                '_status' =>-100,
+                '_result' => $validate->errors()
+            ];
+            return $response;
         }else{
             $insertion = Categories::create([
                 'r_libelle' => $request->r_libelle,
-                'p_description' => $request->p_description,
+                'r_description' => $request->p_description,
                 'r_utilisateur' => $request->p_utilisateur,
                 'r_status' => 1,
             ]);
@@ -122,7 +126,11 @@ class categorieController extends Controller
         $validate = Validator::make($inputs, $errors, $erreurs);
 
         if( $validate->fails()){
-            return $validate->errors();
+            $response = [
+                '_status' =>0,
+                '_result' => $validate->errors()
+            ];
+            return $response;
         }else{
 
             $update = Categories::find($id);

@@ -62,7 +62,11 @@ class produitsController extends Controller
         $validator = Validator::make($inputs,$errors, $erreurs);
 
         if( $validator->fails() ){
-            return $validator->errors();
+            $response = [
+                '_status' =>-100,
+                '_result' => $validator->errors()
+            ];
+            return $response;
         }else{
             $insertion = Produits::create([
                 'r_categorie' => $request->p_categories,
