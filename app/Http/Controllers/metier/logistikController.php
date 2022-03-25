@@ -4,11 +4,11 @@ namespace App\Http\Controllers\metier;
 
 use App\Models\cr;
 use Illuminate\Http\Request;
-use App\Models\metier\Communes;
+use App\Models\metier\Logistik;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
-class communesController extends Controller
+class logistikController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +17,7 @@ class communesController extends Controller
      */
     public function index()
     {
-        $listeCommunes = Communes::orderBy('r_libelle', 'ASC')->get();
-        return $listeCommunes;
+        //
     }
 
     /**
@@ -43,12 +42,14 @@ class communesController extends Controller
         
         // Validation des champs
         $errors = [
-            'r_libelle'  => 'required|unique:t_communes',
+            'r_matricule'  => 'required|unique:t_logistiques',
+            'p_vehicule'  => 'required',
             'p_utilisateur' => 'required'
         ];
         $erreurs = [
-            'r_libelle.required' =>'Le libellé est obligatoire',
-            'r_libelle.unique' =>'Commune déjà existant',
+            'r_matricule.required' =>'Le matricule est obligatoire',
+            'r_matricule.unique' =>'Matricule déjà existant',
+            'p_vehicule.required' =>'Le Matricule est obligatoire',
             'p_utilisateur.required'  => 'Veuillez préciser l\'utilisateur'
         ];
 
@@ -62,18 +63,18 @@ class communesController extends Controller
             return $response;
         }else{
           
-            $insertion = Communes::create([
-                'r_libelle' => $request->r_libelle,
+            $insertion = Logistik::create([
+                'r_matricule' => $request->r_matricule,
+                'r_vehicule' => $request->p_vehicule,
                 'r_description' => $request->p_description,
-                'r_utilisateur' => $request->p_utilisateur,
-                'r_status' => 1,
-                'r_situation_geo' => $request->p_situation_geo,
+                'r_utilisateur' => 1,
+                'r_status' => $request->p_status,
+                'r_utilisateur' => $request->p_utilisateur
             ]);
 
             $response = [
                 '_status' => 1,
-                //'_result' => 'La Commune [ '.$insertion->r_libelle.' ] à bien été enregistrée'
-                '_result' => $insertion
+                '_result' => 'La véhicule [ '.$insertion->r_matricule.' ] à bien été enregistrée'
             ];
             return response()->json($response, 200);
         }
@@ -114,11 +115,14 @@ class communesController extends Controller
         
         // Validation des champs
         $errors = [
-            'r_libelle'  => 'required',
+            'r_matricule'  => 'required',
+            'p_vehicule'  => 'required',
             'p_utilisateur' => 'required'
         ];
         $erreurs = [
-            'r_libelle.required' =>'Le libellé est obligatoire',
+            'r_matricule.required' =>'Le matricule est obligatoire',
+            //'r_matricule.unique' =>'Matricule déjà existant',
+            'p_vehicule.required' =>'Le Matricule est obligatoire',
             'p_utilisateur.required'  => 'Veuillez préciser l\'utilisateur'
         ];
 
@@ -131,36 +135,26 @@ class communesController extends Controller
             ];
             return $response;
         }else{
-          $update = Communes::find($id);
-          
-          if( $update !== null ){
-              
-                $update->update([
-                    'r_libelle'         => $request->r_libelle,
-                    'r_description'     => $request->p_description,
-                    'r_utilisateur'     => $request->p_utilisateur,
-                    'r_status'          => $request->p_status,
-                    'r_situation_geo'   => $request->p_situation_geo,
-                ]);
+            $update = Logistik::find($id);
 
-                $response = [
-                    '_status' => 1,
-                    '_result' => 'Modification effectuée avec succès'
-                ];
-               
-          }else{
-
-                $response = [
-                    '_status' => 1,
-                    '_result' => 'Modification effectuée avec succès'
-                ];
+            if( $update !== null ){
             
-          }
+                $update->update([
+                    //'r_matricule' => $request->r_matricule,
+                    'r_vehicule' => $request->p_vehicule,
+                    'r_description' => $request->p_description,
+                    'r_utilisateur' => 1,
+                    'r_status' => $request->p_status,
+                    'r_utilisateur' => $request->p_utilisateur
+                ]);
+    
                 $response = [
                     '_status' => 1,
-                    '_result' => 'Modification effectuée avec succès'
+                    '_result' => 'MOdification effectuée avec succès'
                 ];
-                return response()->json($response, 200);
+            }
+            
+            return response()->json($response, 200);
         }
     }
 

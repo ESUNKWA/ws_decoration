@@ -5,6 +5,7 @@ namespace App\Http\Controllers\metier;
 use App\Models\cr;
 use Illuminate\Http\Request;
 use App\Models\metier\Produits;
+use App\Models\metier\Achatproduit;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -43,6 +44,7 @@ class produitsController extends Controller
      */
     public function store(Request $request)
     {
+
         //Récupération des champs
         $inputs = $request->all();
         //Validation des formualires
@@ -54,7 +56,7 @@ class produitsController extends Controller
         ];
         $erreurs = [
             'p_libelle.required' =>'Le libellé est obligatoire',
-            'p_categories.required' => 'Le libellé est obligatoire',
+            'p_categories.required' => 'La catégorie est obligatoire',
             'p_stock.required'  => 'Le stock est obligatoire',
             'p_utilisateur.required' => 'Utilisateur inconnu',
         ];
@@ -74,7 +76,7 @@ class produitsController extends Controller
                 'r_description' => $request->p_description,
                 'r_stock' => $request->p_stock,
                 'r_image' => $request->p_image,
-                'p_utilisateur' => $request->p_utilisateur
+                'r_utilisateur' => $request->p_utilisateur
             ]);
         }
         if( $insertion->r_i ){
@@ -142,7 +144,7 @@ class produitsController extends Controller
             'r_libelle' => $request->p_libelle,
             'r_description' => $request->p_description,
             'r_image' => $request->p_image,
-            'p_utilisateur' => $request->p_utilisateur
+            'r_utilisateur' => $request->p_utilisateur
         ]);
         if( $update->r_i ){
             $response = [
@@ -157,6 +159,52 @@ class produitsController extends Controller
         }
 
         return response()->json($response, 200);
+    }
+
+    public function addStock(Request $request){
+        $stock;
+        $data = $request->all();
+
+        //Achat de produit
+        $ajout_achat = $this->add_tarification($data);
+
+        if( $ajout_achat['r_i'] ){
+
+            $stock = intval($request->p_quantite, 10) + intval($request->p_stock_actuel, 10);
+
+            $updateProduit = Produits::find($request->p_idproduit);
+        
+            $updateProduit->update([
+                'r_stock' => $stock
+            ]);
+            if( $updateProduit->r_i ){
+                $response = [
+                    '_status' =>1,
+                    '_result' => 'Enregistrement effectuée avec succès : '.$ajout_achat->r_quantite.', Nouveau stcok : [ '.$stock.' ]'
+                ];
+            }else{
+                $response = [
+                    '_status' =>0,
+                    '_result' => 'Une erreur est survenue lors de la modification'
+                ];
+            }
+
+            return response()->json($response, 200);
+        }
+
+        
+    }
+
+    public function add_tarification($data){
+  
+        $insertion = Achatproduit::create([
+            'r_produit' => $data['p_idproduit'],
+            'r_quantite' => $data['p_quantite'],
+            'r_description' => $data['p_description'],
+            'r_prix_achat' => $data['p_prix_achat'],
+            'r_utilisateur' => $data['p_utilisateur']
+        ]);
+        return $insertion;
     }
 
     /**

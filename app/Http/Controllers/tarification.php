@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\metier;
+namespace App\Http\Controllers;
 
-use App\Models\rc;
+use App\Models\cr;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 
-class achatproduitController extends Controller
+class tarification extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,15 +14,7 @@ class achatproduitController extends Controller
      */
     public function index()
     {
-        $liste_tarification = DB::table('t_produits')
-                                ->join('t_achats_produits', 't_produits.r_i', '=', 't_achats_produits.r_produit')
-                                ->select('t_produits.r_libelle','t_achats_produits.r_quantite','t_achats_produits.r_prix_achat','t_achats_produits.created_at','t_achats_produits.updated_at')
-                                ->get();
-        $response = [
-            '_status' =>1,
-            '_result' => $liste_tarification
-        ];
-        return response()->json($response, 200);
+        //
     }
 
     /**
@@ -51,10 +41,10 @@ class achatproduitController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\rc  $rc
+     * @param  \App\Models\cr  $cr
      * @return \Illuminate\Http\Response
      */
-    public function show(rc $rc)
+    public function show(cr $cr)
     {
         //
     }
@@ -62,10 +52,10 @@ class achatproduitController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\rc  $rc
+     * @param  \App\Models\cr  $cr
      * @return \Illuminate\Http\Response
      */
-    public function edit(rc $rc)
+    public function edit(cr $cr)
     {
         //
     }
@@ -74,10 +64,10 @@ class achatproduitController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\rc  $rc
+     * @param  \App\Models\cr  $cr
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, rc $rc)
+    public function update(Request $request, cr $cr)
     {
         //
     }
@@ -85,10 +75,10 @@ class achatproduitController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\rc  $rc
+     * @param  \App\Models\cr  $cr
      * @return \Illuminate\Http\Response
      */
-    public function destroy(rc $rc)
+    public function destroy(cr $cr)
     {
         //
     }

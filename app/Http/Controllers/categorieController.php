@@ -139,7 +139,7 @@ class categorieController extends Controller
                 'r_libelle' => $request->r_libelle,
                 'r_description' => $request->p_description,
                 'r_utilisateur' => $request->p_utilisateur,
-                'r_status' => $request->p_status,
+                'r_status' => 1,
             ]);
 
             $response = [
