@@ -17,7 +17,12 @@ class logistikController extends Controller
      */
     public function index()
     {
-        //
+        $listeLogistk = Logistik::orderBy('r_matricule', 'ASC')->get();
+        $response = [
+            '_status' => 1,
+            '_result' => $listeLogistk
+        ];
+        return response()->json($response, 200);
     }
 
     /**

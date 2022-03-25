@@ -18,7 +18,11 @@ class communesController extends Controller
     public function index()
     {
         $listeCommunes = Communes::orderBy('r_libelle', 'ASC')->get();
-        return $listeCommunes;
+        $response = [
+            '_status' => 1,
+            '_result' => $listeCommunes
+        ];
+        return response()->json($response, 200);
     }
 
     /**
