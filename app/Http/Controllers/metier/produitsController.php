@@ -162,7 +162,7 @@ class produitsController extends Controller
     }
 
     public function addStock(Request $request){
-        $stock;
+
         $data = $request->all();
 
         //Achat de produit
@@ -173,7 +173,7 @@ class produitsController extends Controller
             $stock = intval($request->p_quantite, 10) + intval($request->p_stock_actuel, 10);
 
             $updateProduit = Produits::find($request->p_idproduit);
-        
+
             $updateProduit->update([
                 'r_stock' => $stock
             ]);
@@ -192,11 +192,11 @@ class produitsController extends Controller
             return response()->json($response, 200);
         }
 
-        
+
     }
 
     public function add_tarification($data){
-  
+
         $insertion = Achatproduit::create([
             'r_produit' => $data['p_idproduit'],
             'r_quantite' => $data['p_quantite'],
