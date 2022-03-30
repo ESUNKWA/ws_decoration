@@ -10,8 +10,10 @@ use App\Http\Controllers\metier\produitsController;
 use App\Http\Controllers\ProfilUtilisatersController;
 use App\Http\Controllers\metier\achatproduitController;
 use App\Http\Controllers\metier\tarificationController;
+use App\Http\Controllers\location\LocationController;
 
 Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif']);
+Route::post('location/{proforma}', [LocationController::class, 'store']);
 Route::post('majstock', [produitsController::class, 'addStock']);
 Route::resources([
     'profils'    => ProfilUtilisatersController::class,
@@ -23,5 +25,5 @@ Route::resources([
     'tarifications' => tarificationController::class,
     'achatproduits' => achatproduitController::class,
     'commune' => communesController::class,
-    'logistik' => logistikController::class
+    'logistik' => logistikController::class,
 ]);
