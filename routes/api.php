@@ -7,13 +7,16 @@ use App\Http\Controllers\utilisateursController;
 use App\Http\Controllers\metier\communesController;
 use App\Http\Controllers\metier\logistikController;
 use App\Http\Controllers\metier\produitsController;
+use App\Http\Controllers\location\LocationController;
 use App\Http\Controllers\ProfilUtilisatersController;
 use App\Http\Controllers\metier\achatproduitController;
 use App\Http\Controllers\metier\tarificationController;
-use App\Http\Controllers\location\LocationController;
+use App\Http\Controllers\location\detailsLocationController;
 
 Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif']);
 Route::post('location/{proforma}', [LocationController::class, 'store']);
+Route::get('detailslocation/{idlocation}', [detailsLocationController::class, 'show']);
+Route::get('location', [LocationController::class, 'index']);
 Route::post('majstock', [produitsController::class, 'addStock']);
 Route::resources([
     'profils'    => ProfilUtilisatersController::class,

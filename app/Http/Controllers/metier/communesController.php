@@ -5,6 +5,7 @@ namespace App\Http\Controllers\metier;
 use App\Models\cr;
 use Illuminate\Http\Request;
 use App\Models\metier\Communes;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +18,7 @@ class communesController extends Controller
      */
     public function index()
     {
-        $listeCommunes = Communes::orderBy('r_libelle', 'ASC')->get();
+        $listeCommunes = DB::select('select r_i as value, r_libelle as label, created_at from t_communes');
         $response = [
             '_status' => 1,
             '_result' => $listeCommunes

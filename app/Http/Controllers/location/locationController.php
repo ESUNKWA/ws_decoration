@@ -6,6 +6,7 @@ use App\Models\cr;
 use Illuminate\Http\Request;
 use App\Models\location\client;
 use App\Models\location\Location;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\location\Detailslocacation;
@@ -19,7 +20,21 @@ class locationController extends Controller
      */
     public function index()
     {
-        //
+        $listeLocation = DB::table('t_clients')
+        ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+        ->join('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
+        ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+        ->select('t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_locations.*','t_logistiques.r_vehicule','t_communes.r_libelle')
+        // ->select('t_clients.r_nom','t_clients.r_prenoms',
+        //             't_locations.r_num','t_locations.r_mnt_total','t_locations.r_remise', 't_locations.r_mnt_total_remise','t_locations.r_mnt_total_remise',
+        //             't_logistiques.r_vehicule','t_communes.r_libelle')
+        ->get();
+
+        $response = [
+            '_status' => 1,
+            '_result' => $listeLocation
+        ];
+        return response()->json($response, 200);
     }
 
     /**
@@ -80,7 +95,10 @@ class locationController extends Controller
         }else{
 
             
+            //Insertion des données du client
             try {
+                //DB::beginTransaction();
+
                 $insertion = client::create([
                     'r_nom' => $request->p_nom,
                     'r_prenoms' => $request->p_prenoms,
@@ -89,20 +107,24 @@ class locationController extends Controller
                     'r_description' => $request->p_description,
                     'r_utilisateur' => $request->p_utilisateur,
                 ]);
-                
+               
+                //Insertion des données de locations
                 try {
                     $insertion_location = Location::create([
                         'r_client' => $insertion->r_i,
-                        'r_num' => 12345,
+                        'r_num' => 7444,
                         'r_mnt_total' => $request->p_mnt_total,
                         'r_status' => 0,
-                        'r_mnt_logistik' => $request->p_frais,
+                        'r_frais_transport' => $request->p_frais,
                         'r_destination' => $request->p_commune_arrive,
-                        'r_remise' => 0,
-                        'r_montant' => 0,
-                        'r_logistik' => $request->p_vehicule
+                        'r_remise' => $request->p_remise,
+                        'r_mnt_total_remise' =>  $request->p_mnt_total_remise,
+                        'r_logistik' => $request->p_vehicule,
+                        'r_date_envoie' => $request->p_date_envoie,
+                        'r_date_retour' => $request->p_date_retour,
+                        'r_utilisateur' => $request->p_utilisateur
                     ]);
-
+                    
                     try {
                         //dd($request->p_details);
 
@@ -110,29 +132,38 @@ class locationController extends Controller
                          
                             $insertion_details = Detailslocacation::create([
                                 'r_quantite' => $request->p_details[$i]["qte"],
-                                'r_produit' => $request->p_details[$i]["produit"],
+                                'r_produit' => $request->p_details[$i]["idproduit"],
                                 'r_location' => $insertion_location->r_i,
                                 'r_sous_total' => $request->p_details[$i]["total"],
-                                'r_utilisateur' => $request->p_utilisateur
+                                'r_utilisateur' => $request->p_utilisateur,
+                                'r_prix_unitaire' => 1000
                             ]);
                          }
 
+                         $response = [
+                            "_status" => 1,
+                            "_result" => "Enregistrement effectué avec succès"
+                         ];
+                         
+                         return response()->json($response, 200);
                         
                     } catch (\Throwable $e) {
+                      
                         return $e->getMessage();
                     }
 
 
 
                 } catch (\Throwable $e) {
+                   
                     return $e->getMessage();
                 }
 
-            
+                //DB::commit();
             } catch (\Throwable $e) {
+                //DB::rollBack();
                 return $e->getMessage();
-            }
-
+            }     
         }
     }
 

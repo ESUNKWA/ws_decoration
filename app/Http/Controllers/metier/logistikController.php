@@ -5,6 +5,7 @@ namespace App\Http\Controllers\metier;
 use App\Models\cr;
 use Illuminate\Http\Request;
 use App\Models\metier\Logistik;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +18,7 @@ class logistikController extends Controller
      */
     public function index()
     {
-        $listeLogistk = Logistik::orderBy('r_matricule', 'ASC')->get();
+        $listeLogistk = DB::select('select r_i as value, r_vehicule as label, r_matricule from t_logistiques order by r_vehicule asc');
         $response = [
             '_status' => 1,
             '_result' => $listeLogistk
