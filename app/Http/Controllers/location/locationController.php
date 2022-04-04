@@ -170,6 +170,51 @@ class locationController extends Controller
         //
     }
 
+
+    public function updateStat(Request $request){
+
+        $location = Location::find($request->p_idlocation);
+
+        if( !empty($location) ){
+            $p;
+            try{
+
+                $location->update([
+                    'r_status' => $request->p_status
+                ]);
+                switch ($location->r_status) {
+                    case 0:
+                       $p = 'Location en attente de validation';
+                        break;
+    
+                    case 1:
+                        $p = 'Demande de location valider avec succès';
+                        break;
+                    
+                    default:
+                        $p = 'Demande de location annulée';
+                        break;
+                }
+    
+                $response = [
+                    '_status' =>1,
+                    '_result' => $p
+                ];
+    
+            } catch(Exception $e){
+                return $e->getMessage();
+            }
+
+        }else{
+            $response = [
+                '_status' =>1,
+                '_result' => 'Valeur non retrouvée'
+            ];
+        }
+
+        return response()->json($response, 200);
+    }
+
     /**
      * Remove the specified resource from storage.
      *

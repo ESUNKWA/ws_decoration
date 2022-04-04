@@ -14,6 +14,7 @@ use App\Http\Controllers\location\LocationController;
 
 Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif']);
 Route::post('location/{proforma}', [LocationController::class, 'store']);
+Route::post('updatestatlocation', [LocationController::class, 'updateStat']);
 Route::post('majstock', [produitsController::class, 'addStock']);
 Route::resources([
     'profils'    => ProfilUtilisatersController::class,
