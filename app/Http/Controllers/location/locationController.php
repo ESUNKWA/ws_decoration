@@ -18,13 +18,14 @@ class locationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($status)
     {
         $listeLocation = DB::table('t_clients')
         ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
-        ->join('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
+        //->join('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
         ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
-        ->select('t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_locations.*','t_logistiques.r_vehicule','t_communes.r_libelle')
+        ->select('t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_locations.*','t_communes.r_libelle')
+        ->where('t_locations.r_status',$status)
         // ->select('t_clients.r_nom','t_clients.r_prenoms',
         //             't_locations.r_num','t_locations.r_mnt_total','t_locations.r_remise', 't_locations.r_mnt_total_remise','t_locations.r_mnt_total_remise',
         //             't_logistiques.r_vehicule','t_communes.r_libelle')
@@ -94,7 +95,7 @@ class locationController extends Controller
             return $validator->errors();
         }else{
 
-            
+
             //Insertion des données du client
             try {
                 //DB::beginTransaction();
@@ -107,7 +108,7 @@ class locationController extends Controller
                     'r_description' => $request->p_description,
                     'r_utilisateur' => $request->p_utilisateur,
                 ]);
-               
+
                 //Insertion des données de locations
                 try {
                     $insertion_location = Location::create([
@@ -124,12 +125,12 @@ class locationController extends Controller
                         'r_date_retour' => $request->p_date_retour,
                         'r_utilisateur' => $request->p_utilisateur
                     ]);
-                    
+
                     try {
                         //dd($request->p_details);
 
-                        for ($i=0; $i < count($request->p_details); $i++) { 
-                         
+                        for ($i=0; $i < count($request->p_details); $i++) {
+
                             $insertion_details = Detailslocacation::create([
                                 'r_quantite' => $request->p_details[$i]["qte"],
                                 'r_produit' => $request->p_details[$i]["idproduit"],
@@ -144,18 +145,18 @@ class locationController extends Controller
                             "_status" => 1,
                             "_result" => "Enregistrement effectué avec succès"
                          ];
-                         
+
                          return response()->json($response, 200);
-                        
+
                     } catch (\Throwable $e) {
-                      
+
                         return $e->getMessage();
                     }
 
 
 
                 } catch (\Throwable $e) {
-                   
+
                     return $e->getMessage();
                 }
 
@@ -163,7 +164,7 @@ class locationController extends Controller
             } catch (\Throwable $e) {
                 //DB::rollBack();
                 return $e->getMessage();
-            }     
+            }
         }
     }
 
