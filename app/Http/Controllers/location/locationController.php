@@ -56,6 +56,7 @@ class locationController extends Controller
      */
     public function store(Request $request, $mode)
     {
+        
         $inputs = $request->all();
 
         $errors = [
@@ -94,8 +95,8 @@ class locationController extends Controller
         if( $validator->fails()){
             return $validator->errors();
         }else{
-
-
+            $date = date('ym');
+            
             //Insertion des données du client
             try {
                 //DB::beginTransaction();
@@ -113,7 +114,7 @@ class locationController extends Controller
                 try {
                     $insertion_location = Location::create([
                         'r_client' => $insertion->r_i,
-                        'r_num' => 7444,
+                        'r_num' => ($insertion->r_i < 9 )? $date.'0'.$insertion->r_i : $date.$insertion->r_i ,
                         'r_mnt_total' => $request->p_mnt_total,
                         'r_status' => 0,
                         'r_frais_transport' => $request->p_frais,
