@@ -18,17 +18,14 @@ class locationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($status)
+    public function index($status, $date)
     {
         $listeLocation = DB::table('t_clients')
         ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
-        //->join('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
         ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
         ->select('t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_locations.*','t_communes.r_libelle')
         ->where('t_locations.r_status',$status)
-        // ->select('t_clients.r_nom','t_clients.r_prenoms',
-        //             't_locations.r_num','t_locations.r_mnt_total','t_locations.r_remise', 't_locations.r_mnt_total_remise','t_locations.r_mnt_total_remise',
-        //             't_logistiques.r_vehicule','t_communes.r_libelle')
+        ->whereDate('t_locations.r_date_envoie', '=', $date)
         ->get();
 
         $response = [

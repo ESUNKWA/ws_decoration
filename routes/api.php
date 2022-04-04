@@ -17,7 +17,7 @@ Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif
 Route::post('location/{proforma}', [LocationController::class, 'store']);
 
 Route::get('detailslocation/{idlocation}', [detailsLocationController::class, 'show']);
-Route::get('location/{status}', [LocationController::class, 'index']);
+Route::get('location/{status}/{date}', [LocationController::class, 'index']);
 
 Route::post('updatestatlocation', [LocationController::class, 'updateStat']);
 
