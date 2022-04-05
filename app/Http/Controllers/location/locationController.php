@@ -23,7 +23,7 @@ class locationController extends Controller
         $listeLocation = DB::table('t_clients')
         ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
         ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
-        ->select('t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_locations.*','t_communes.r_libelle')
+        ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
         ->where('t_locations.r_status',$status)
         ->whereDate('t_locations.r_date_envoie', '=', $date)
         ->get();
@@ -204,7 +204,7 @@ class locationController extends Controller
     public function updateStat(Request $request){
 
         $location = Location::find($request->p_idlocation);
-
+        
         if( !empty($location) ){
             $p;
             try{
