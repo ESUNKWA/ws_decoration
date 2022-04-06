@@ -5,6 +5,7 @@ namespace App\Http\Controllers\location;
 use App\Models\cr;
 use Illuminate\Http\Request;
 use App\Models\location\client;
+use App\Models\metier\Produits;
 use App\Models\location\Location;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -13,24 +14,53 @@ use App\Models\location\Detailslocacation;
 
 class locationController extends Controller
 {
+    private $listeLocation;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($status, $date)
+    public function index($status, $date, $mode)
     {
-        $listeLocation = DB::table('t_clients')
-        ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
-        ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
-        ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
-        ->where('t_locations.r_status',$status)
-        ->whereDate('t_locations.r_date_envoie', '=', $date)
-        ->get();
+        
+
+        switch ($mode) {
+
+            case 1:
+                $this->listeLocation = DB::table('t_clients')
+                ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+                ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+                ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
+                ->where('t_locations.r_status',$status)
+                ->whereDate('t_locations.r_date_envoie', '=', $date)
+                ->get();
+                break;
+
+            case 2:
+                $this->listeLocation = DB::table('t_clients')
+                ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+                ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+                ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
+                ->where('t_locations.r_status',$status)
+                ->whereDate('t_locations.r_date_retour', '=', $date)
+                ->get();
+                break;
+
+            default:
+            $this->listeLocation = DB::table('t_clients')
+                ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+                ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+                ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
+                ->where('t_locations.r_status',$status)
+                ->whereBetween('t_locations.r_date_retour', [$startDate, $endDate])
+                ->get();
+            break;
+
+        }
 
         $response = [
             '_status' => 1,
-            '_result' => $listeLocation
+            '_result' => $this->listeLocation
         ];
         return response()->json($response, 200);
     }
@@ -101,7 +131,7 @@ class locationController extends Controller
                 $insertion = client::create([
                     'r_nom' => $request->p_nom,
                     'r_prenoms' => $request->p_prenoms,
-                    'r_telephone' => $request->p_telephone,
+                    'r_telephone' => '225'.$request->p_telephone,
                     'r_email' => $request->p_email,
                     'r_description' => $request->p_description,
                     'r_utilisateur' => $request->p_utilisateur,
@@ -134,8 +164,8 @@ class locationController extends Controller
                                 'r_produit' => $request->p_details[$i]["idproduit"],
                                 'r_location' => $insertion_location->r_i,
                                 'r_sous_total' => $request->p_details[$i]["total"],
-                                'r_utilisateur' => $request->p_utilisateur,
-                                'r_prix_unitaire' => 1000
+                                'r_utilisateur' => $request->p_utilisateur
+                                //'r_prix_unitaire' => 1000
                             ]);
                          }
 
@@ -218,7 +248,11 @@ class locationController extends Controller
                         break;
     
                     case 1:
-                        $p = 'Demande de location valider avec succès';
+                        $p = 'Location valider avec succès';
+                        break;
+
+                    case 2:
+                        $p = 'Location terminée';
                         break;
                     
                     default:
@@ -254,5 +288,38 @@ class locationController extends Controller
     public function destroy(cr $cr)
     {
         //
+    }
+
+    public function retourProduit(Request $request){
+
+        $tabs = $request->all()["p_produit"];
+        //dd($tabs[0]);
+        try{
+
+            foreach( $tabs as $val ){
+          
+                $produit = Produits::find($val['idproduit']);
+
+                $produit->update([
+                   'r_stock' => $val['qte'] + $produit['r_stock']
+                ]);
+    
+                
+            }
+
+            $response = [
+                '_status' =>1,
+                '_result' => 'Enregistrement effectué avec succès'
+            ];
+
+            return response()->json($response, 200);
+
+        }catch(Exception $e){
+            return $e->getMessage();
+        }
+
+        
+
+
     }
 }

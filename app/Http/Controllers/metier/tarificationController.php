@@ -20,7 +20,7 @@ class tarificationController extends Controller
     {
         $liste_tarification = DB::table('t_produits')
                                 ->join('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
-                                ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_tarifications.r_prix_location','t_tarifications.r_duree',)
+                                ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
                                 ->get();
         $response = [
             '_status' =>1,
