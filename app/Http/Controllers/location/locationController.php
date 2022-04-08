@@ -20,19 +20,28 @@ class locationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($status, $date, $mode)
+    public function index(Request $request)
     {
+        $inputs = $request->all();
+
+        
+        $errors = [
+            'p_status'=> 'required',
+        ];
+        $erreurs = [
+            'p_status.required' => 'Veuillez selectionner le type'
+        ];
         
 
-        switch ($mode) {
+        switch ($inputs['p_mode']) {
 
             case 1:
                 $this->listeLocation = DB::table('t_clients')
                 ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
                 ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
                 ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
-                ->where('t_locations.r_status',$status)
-                ->whereDate('t_locations.r_date_envoie', '=', $date)
+                ->where('t_locations.r_status', DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
+                ->whereDate('t_locations.r_date_envoie', '=', $inputs['p_date'])
                 ->get();
                 break;
 
@@ -41,8 +50,8 @@ class locationController extends Controller
                 ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
                 ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
                 ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
-                ->where('t_locations.r_status',$status)
-                ->whereDate('t_locations.r_date_retour', '=', $date)
+                ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
+                ->whereDate('t_locations.r_date_retour', '=', $inputs['p_date'])
                 ->get();
                 break;
 
@@ -51,8 +60,9 @@ class locationController extends Controller
                 ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
                 ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
                 ->select('t_clients.*','t_locations.*','t_communes.r_libelle')
-                ->where('t_locations.r_status',$status)
-                ->whereBetween('t_locations.r_date_retour', [$startDate, $endDate])
+                ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
+                ->whereDate('t_locations.r_date_envoie', '>=', $inputs['p_date'])
+                ->whereDate('t_locations.r_date_retour', '<=', $inputs['p_date_retour'])
                 ->get();
             break;
 

@@ -115,7 +115,7 @@ class categorieController extends Controller
 
         // Validation des champs
         $errors = [
-            'r_libelle'  => 'required',
+            'r_libelle'  => 'required|unique:t_categories',
             'p_utilisateur' => 'required'
         ];
         $erreurs = [
