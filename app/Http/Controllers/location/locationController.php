@@ -93,7 +93,6 @@ class locationController extends Controller
      */
     public function store(Request $request, $mode)
     {
-        
         $inputs = $request->all();
 
         $errors = [
@@ -126,7 +125,7 @@ class locationController extends Controller
             'p_mnt_total.required' => 'Le montant du total de la location est inconnu',
             'p_utilisateur.required' => 'L\'utilisateur est inconnue'
         ];
-
+        
         $validator = Validator::make($inputs, $errors, $erreurs);
 
         if( $validator->fails()){
@@ -161,6 +160,7 @@ class locationController extends Controller
                         'r_logistik' => $request->p_vehicule,
                         'r_date_envoie' => $request->p_date_envoie,
                         'r_date_retour' => $request->p_date_retour,
+                        'r_duree' => $request->p_duree,
                         'r_utilisateur' => $request->p_utilisateur
                     ]);
 
@@ -179,12 +179,10 @@ class locationController extends Controller
                             ]);
                          }
 
-                         $response = [
-                            "_status" => 1,
-                            "_result" => "Enregistrement effectué avec succès"
-                         ];
+                          $res = $this->majstockProduit($request);
+                         return $res;
 
-                         return response()->json($response, 200);
+                         //return response()->json($response, 200);
 
                     } catch (\Throwable $e) {
 
@@ -246,12 +244,13 @@ class locationController extends Controller
         $location = Location::find($request->p_idlocation);
         
         if( !empty($location) ){
-            $p;
+            $p; $t;
             try{
 
                 $location->update([
                     'r_status' => $request->p_status
                 ]);
+
                 switch ($location->r_status) {
                     case 0:
                        $p = 'Location en attente de validation';
@@ -262,6 +261,7 @@ class locationController extends Controller
                         break;
 
                     case 2:
+                        $t = $this->majstockProduit($request);
                         $p = 'Location terminée';
                         break;
                     
@@ -269,6 +269,9 @@ class locationController extends Controller
                         $p = 'Demande de location annulée';
                         break;
                 }
+
+                //$res = $this->majstockProduit($request);
+                //return $res;
     
                 $response = [
                     '_status' =>1,
@@ -300,29 +303,33 @@ class locationController extends Controller
         //
     }
 
-    public function retourProduit(Request $request){
+    public function majstockProduit(Request $request){
 
-        $tabs = $request->all()["p_produit"];
-        //dd($tabs[0]);
+        $tabs = $request->p_details;
+        $signe = $request->p_signe;
+
         try{
 
             foreach( $tabs as $val ){
           
                 $produit = Produits::find($val['idproduit']);
 
+                $tt = intval($produit['r_stock']) . $signe . intval($val['qte']); // Former une équation de chaîne
+
+                $p = eval('return '.$tt.';'); // Évaluation de l'équation
+
                 $produit->update([
-                   'r_stock' => $val['qte'] + $produit['r_stock']
+                   'r_stock' => $p
                 ]);
-    
-                
+
             }
+            return true;
+            // $response = [
+            //     '_status' =>1,
+            //     '_result' => 'Enregistrement effectué avec succès'
+            // ];
 
-            $response = [
-                '_status' =>1,
-                '_result' => 'Enregistrement effectué avec succès'
-            ];
-
-            return response()->json($response, 200);
+            // return response()->json($response, 200);
 
         }catch(Exception $e){
             return $e->getMessage();

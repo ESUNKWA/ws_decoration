@@ -23,7 +23,7 @@ Route::get('detailslocation/{idlocation}', [detailsLocationController::class, 's
 Route::post('location', [LocationController::class, 'index']);
 
 Route::post('updatestatlocation', [LocationController::class, 'updateStat']);
-Route::post('retourProduit', [LocationController::class, 'retourProduit']);
+Route::post('majstockProduit', [LocationController::class, 'majstockProduit']);
 
 Route::post('majstock', [produitsController::class, 'addStock']);
 Route::resources([

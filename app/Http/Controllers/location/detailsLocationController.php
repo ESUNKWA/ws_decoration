@@ -51,8 +51,8 @@ class detailsLocationController extends Controller
         $detailByLocation = DB::table('t_produits')
                                 //->join('t_locations', 't_locations.r_i', 't_details_locations.r_location')
                                 ->join('t_details_locations', 't_produits.r_i', 't_details_locations.r_produit')
-                                //->join('t_tarifications', 't_produits.r_i', 't_tarifications.r_produit')
-                                ->select('t_details_locations.*', 't_produits.r_libelle as lib_produit')
+                                ->join('t_tarifications', 't_produits.r_i', 't_tarifications.r_produit')
+                                ->select('t_details_locations.*', 't_produits.r_libelle as lib_produit', 't_tarifications.r_prix_location')
                                 ->where('t_details_locations.r_location', $idlocation)
                                 ->get();
         $response = [
