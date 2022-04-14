@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authController;
+use App\Http\Controllers\dashController;
 use App\Http\Controllers\categorieController;
 use App\Http\Controllers\utilisateursController;
 use App\Http\Controllers\metier\communesController;
@@ -37,4 +38,6 @@ Route::resources([
     'achatproduits' => achatproduitController::class,
     'commune' => communesController::class,
     'logistik' => logistikController::class,
+    //Dashbord
+    'dash' => dashController::class,
 ]);
