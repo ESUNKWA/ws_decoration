@@ -14,6 +14,7 @@ use App\Http\Controllers\personnel\fonctionController;
 use App\Http\Controllers\metier\achatproduitController;
 use App\Http\Controllers\metier\tarificationController;
 use App\Http\Controllers\location\detailsLocationController;
+use App\Http\Controllers\personnel\PersonnelController;
 
 Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif']);
 Route::post('location/{proforma}', [LocationController::class, 'store']);
@@ -37,4 +38,5 @@ Route::resources([
     'dash' => dashController::class,
     //Personnel
     'fonction' => fonctionController::class,
+    'personnel' => PersonnelController::class,
 ]);
