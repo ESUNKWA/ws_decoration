@@ -10,6 +10,7 @@ use App\Http\Controllers\metier\logistikController;
 use App\Http\Controllers\metier\produitsController;
 use App\Http\Controllers\location\LocationController;
 use App\Http\Controllers\ProfilUtilisatersController;
+use App\Http\Controllers\personnel\fonctionController;
 use App\Http\Controllers\metier\achatproduitController;
 use App\Http\Controllers\metier\tarificationController;
 use App\Http\Controllers\location\detailsLocationController;
@@ -34,4 +35,6 @@ Route::resources([
     'logistik' => logistikController::class,
     //Dashbord
     'dash' => dashController::class,
+    //Personnel
+    'fonction' => fonctionController::class,
 ]);
