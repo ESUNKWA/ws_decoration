@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\rc;
 use App\Models\Utilisateurs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class utilisateursController extends Controller
@@ -16,7 +17,10 @@ class utilisateursController extends Controller
      */
     public function index()
     {
-        $listeUtilisateurs = Utilisateurs::orderBy('r_nom', 'ASC')->get();
+        $listeUtilisateurs = DB::table('t_utilisateurs')
+                                ->join('t_profils', 't_profils.r_i','=','t_utilisateurs.r_profil')
+                                ->select('t_utilisateurs.r_nom','t_utilisateurs.r_prenoms','t_utilisateurs.r_telephone','t_profils.r_libelle as profil')
+                                ->get();
         $datas = [
             '_status'   => 1,
             '_result'   => $listeUtilisateurs
