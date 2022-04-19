@@ -30,6 +30,21 @@ class personnelController extends Controller
         return response()->json($datas, 200);
     }
 
+    public function listNotUser()
+    {
+        $listePersonnel = DB::table('t_personnels')
+        ->leftJoin('t_utilisateurs', 't_personnels.r_i','=','t_utilisateurs.r_personnel')
+        ->select('t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_personnels.r_i')
+        ->where('t_utilisateurs.r_personnel', null)
+        ->orderBy('t_personnels.r_i', 'ASC')
+        ->get();
+        $datas = [
+        '_status'   => 1,
+        '_result'   => $listePersonnel
+        ];
+        return response()->json($datas, 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -52,11 +67,11 @@ class personnelController extends Controller
 
         // Validation des champs
         $errors = [
-            'r_nom'  => 'required|unique:t_personnels',
+            'p_nom'  => 'required',
             'p_utilisateur' => 'required'
         ];
         $erreurs = [
-            'r_nom.required' =>'Le libellé est obligatoire',
+            'p_nom.required' =>'Le nom est obligatoire',
             'p_utilisateur.required'  => 'Veuillez préciser l\'utilisateur'
         ];
 
@@ -72,6 +87,7 @@ class personnelController extends Controller
                     'r_nom' => $request->p_nom,
                     'r_prenoms' => $request->p_prenoms,
                     'r_contact' => $request->p_contact,
+                    'r_email' => $request->p_email,
                     'r_date_entree' => $request->p_date_entree,
                     'r_date_depart' => $request->p_date_depart,
                     'r_quatier' => $request->p_quatier,

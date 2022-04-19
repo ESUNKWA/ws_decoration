@@ -24,14 +24,14 @@ class locationController extends Controller
     {
         $inputs = $request->all();
 
-        
+
         $errors = [
             'p_status'=> 'required',
         ];
         $erreurs = [
             'p_status.required' => 'Veuillez selectionner le type'
         ];
-        
+
 
         switch ($inputs['p_mode']) {
 
@@ -125,14 +125,14 @@ class locationController extends Controller
             'p_mnt_total.required' => 'Le montant du total de la location est inconnu',
             'p_utilisateur.required' => 'L\'utilisateur est inconnue'
         ];
-        
+
         $validator = Validator::make($inputs, $errors, $erreurs);
 
         if( $validator->fails()){
             return $validator->errors();
         }else{
             $date = date('ym');
-            
+
             //Insertion des données du client
             try {
                 //DB::beginTransaction();
@@ -180,7 +180,12 @@ class locationController extends Controller
                          }
 
                           $res = $this->majstockProduit($request);
-                         return $res;
+
+                         $response = [
+                            '_status' => 1,
+                            '_result' => 'Enregistrement effectuée avec succès'
+                        ];
+                        return response()->json($response, 200);
 
                          //return response()->json($response, 200);
 
@@ -242,9 +247,8 @@ class locationController extends Controller
     public function updateStat(Request $request){
 
         $location = Location::find($request->p_idlocation);
-        
+
         if( !empty($location) ){
-            $p; $t;
             try{
 
                 $location->update([
@@ -255,7 +259,7 @@ class locationController extends Controller
                     case 0:
                        $p = 'Location en attente de validation';
                         break;
-    
+
                     case 1:
                         $p = 'Location valider avec succès';
                         break;
@@ -264,7 +268,7 @@ class locationController extends Controller
                         $t = $this->majstockProduit($request);
                         $p = 'Location terminée';
                         break;
-                    
+
                     default:
                         $p = 'Demande de location annulée';
                         break;
@@ -272,13 +276,13 @@ class locationController extends Controller
 
                 //$res = $this->majstockProduit($request);
                 //return $res;
-    
+
                 $response = [
                     '_status' =>1,
                     '_result' => $p
                 ];
-    
-            } catch(Exception $e){
+
+            } catch(\Throwable $e){
                 return $e->getMessage();
             }
 
@@ -311,7 +315,7 @@ class locationController extends Controller
         try{
 
             foreach( $tabs as $val ){
-          
+
                 $produit = Produits::find($val['idproduit']);
 
                 $tt = intval($produit['r_stock']) . $signe . intval($val['qte']); // Former une équation de chaîne
@@ -331,11 +335,11 @@ class locationController extends Controller
 
             // return response()->json($response, 200);
 
-        }catch(Exception $e){
+        }catch(\Throwable $e){
             return $e->getMessage();
         }
 
-        
+
 
 
     }

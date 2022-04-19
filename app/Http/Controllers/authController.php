@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\rc;
 use App\Models\Utilisateurs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class authController extends Controller
@@ -16,7 +17,7 @@ class authController extends Controller
      */
     public function index(Request $request)
     {
-            
+
     }
 
     /**
@@ -37,6 +38,7 @@ class authController extends Controller
      */
     public function store(Request $request)
     {
+
         // Validation des données
         $errors = [
             'p_login' => 'required',
@@ -48,6 +50,8 @@ class authController extends Controller
         ];
 
 
+
+
         $validate = Validator::make($request->all(), $errors, $erreurs);
 
 
@@ -55,9 +59,13 @@ class authController extends Controller
             return $validate->errors();
         }
 
-        $login = Utilisateurs::where('r_login', $request->p_login)
-                            ->where('password', MD5($request->p_mdp))
-                            ->get();
+        $login = DB::table('t_utilisateurs')
+                    ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
+                    ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
+                    ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_profils.r_libelle as profil')
+                    ->where('r_login', $request->p_login)
+                    ->where('password', MD5($request->p_mdp))
+                    ->get();
 
 
         if( count($login) >= 1 ){

@@ -8,7 +8,7 @@ use App\Http\Controllers\utilisateursController;
 use App\Http\Controllers\metier\communesController;
 use App\Http\Controllers\metier\logistikController;
 use App\Http\Controllers\metier\produitsController;
-use App\Http\Controllers\location\LocationController;
+use App\Http\Controllers\location\locationController;
 use App\Http\Controllers\ProfilUtilisatersController;
 use App\Http\Controllers\personnel\fonctionController;
 use App\Http\Controllers\metier\achatproduitController;
@@ -17,12 +17,13 @@ use App\Http\Controllers\location\detailsLocationController;
 use App\Http\Controllers\personnel\PersonnelController;
 
 Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif']);
-Route::post('location/{proforma}', [LocationController::class, 'store']);
+Route::post('location/{proforma}', [locationController::class, 'store']);
 Route::get('detailslocation/{idlocation}', [detailsLocationController::class, 'show']);
-Route::post('location', [LocationController::class, 'index']);
-Route::post('updatestatlocation', [LocationController::class, 'updateStat']);
-Route::post('majstockProduit', [LocationController::class, 'majstockProduit']);
+Route::post('location', [locationController::class, 'index']);
+Route::post('updatestatlocation', [locationController::class, 'updateStat']);
+Route::post('majstockProduit', [locationController::class, 'majstockProduit']);
 Route::post('majstock', [produitsController::class, 'addStock']);
+Route::get('personneltNotUser', [PersonnelController::class, 'listNotUser']);
 Route::resources([
     'profils'    => ProfilUtilisatersController::class,
     'auth'    => authController::class,

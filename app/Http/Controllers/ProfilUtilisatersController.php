@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Validator;
 class ProfilUtilisatersController extends Controller
 {
     public function index(){
-        $liste_profil = t_profils::orderBy('r_libelle', 'ASC')->get();
+        $liste_profil = t_profils::orderBy('r_libelle', 'ASC')
+        ->select('t_profils.r_i as value','t_profils.r_libelle as label')
+        ->get();
         $datas = [
             '_status' => 1,
             '_result' => $liste_profil

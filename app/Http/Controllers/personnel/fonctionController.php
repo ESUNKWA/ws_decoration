@@ -5,6 +5,7 @@ namespace App\Http\Controllers\personnel;
 use App\Models\cr;
 use Illuminate\Http\Request;
 use App\Models\personnel\Fonction;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,7 +18,9 @@ class fonctionController extends Controller
      */
     public function index()
     {
-        $liste_fonctions = Fonction::orderBy('r_libelle', 'ASC')->get();
+        $liste_fonctions = DB::table('t_fonctions')
+        ->select('t_fonctions.r_i as value','t_fonctions.r_libelle as label')
+        ->get();
         $datas = [
             '_status' => 1,
             '_result' => $liste_fonctions

@@ -18,8 +18,10 @@ class utilisateursController extends Controller
     public function index()
     {
         $listeUtilisateurs = DB::table('t_utilisateurs')
+                                ->join('t_personnels', 't_personnels.r_i','=','t_utilisateurs.r_personnel')
                                 ->join('t_profils', 't_profils.r_i','=','t_utilisateurs.r_profil')
-                                ->select('t_utilisateurs.r_nom','t_utilisateurs.r_prenoms','t_utilisateurs.r_telephone','t_profils.r_libelle as profil')
+                                ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_utilisateurs.r_status',
+                                't_personnels.r_nom','t_personnels.r_prenoms','t_profils.r_code_profil','t_profils.r_libelle as profil')
                                 ->get();
         $datas = [
             '_status'   => 1,
@@ -50,22 +52,13 @@ class utilisateursController extends Controller
 
         // Validation des champs
         $errors = [
-            'p_profil'  => 'required',
-            'p_nom'  => 'required|between:2,20',
-            'p_prenoms'  => 'required|between:2,30',
-            'r_telephone'  => 'required|unique:t_utilisateurs',
+            'p_personnel'  => 'required',
             'r_login'  => 'required|min:4|unique:t_utilisateurs',
             'password'  => 'required|min:4|confirmed'
         ];
 
         $erreurs = [
-            'p_profil.required'  => 'Le profil est réquis',
-            'p_nom.required'  => 'Le nom est réquis',
-            'p_nom.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
-            'p_prenoms.required'  => 'le nom est réquis',
-            'p_prenoms.between'  => 'La taille du nom est compris entre 2 et 20 caractères',
-            'r_telephone.required'  => 'Le numéro de téléphone est réquis',
-            'r_telephone.unique'  => 'Le numéro de téléphone déjà existant',
+            'p_personnel.required'  => 'Le profil est réquis',
             'r_login.required'  => 'L\'identifiant est obligatoire',
             'r_login.min'       => 'L\'identifiant doit avoir au minimum 4 caractères',
             'r_login.unique'       => 'Login déjà existant',
@@ -84,18 +77,16 @@ class utilisateursController extends Controller
         }else{
 
             $insertion = Utilisateurs::create([
+                'r_personnel' => $request->p_personnel,
                 'r_profil' => $request->p_profil,
-                'r_nom' => $request->p_nom,
-                'r_prenoms'=>   $request->p_prenoms,
-                'r_telephone'   => $request->r_telephone,
+                'r_utilisateur' => $request->p_utilisateur,
                 'r_login' => $request->r_login,
                 'password' => MD5($request->password),
-                'r_photo'   => $request->p_img_name,
                 'r_status'  => 1,
             ]);
             $response = [
                 '_status' => 1,
-                '_result' => 'L\'utilisateur [ '.$insertion->r_nom.' ] à bien été enregistré(e)',
+                '_result' => 'L\'utilisateur à bien été enregistré(e)',
             ];
             return response()->json($response, 200);
         }
