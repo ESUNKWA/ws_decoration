@@ -182,6 +182,8 @@ class locationController extends Controller
 
                           $res = $this->majstockProduit($request);
 
+                          
+
                          $response = [
                             '_status' => 1,
                             '_result' => 'Enregistrement effectuée avec succès'
