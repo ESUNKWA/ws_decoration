@@ -44,7 +44,6 @@ class produitsController extends Controller
      */
     public function store(Request $request)
     {
-
         //Récupération des champs
         $inputs = $request->all();
         //Validation des formualires

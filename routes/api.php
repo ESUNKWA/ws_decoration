@@ -24,6 +24,7 @@ Route::post('updatestatlocation', [locationController::class, 'updateStat']);
 Route::post('majstockProduit', [locationController::class, 'majstockProduit']);
 Route::post('majstock', [produitsController::class, 'addStock']);
 Route::get('personneltNotUser', [PersonnelController::class, 'listNotUser']);
+Route::post('tarifapply', [tarificationController::class, 'tarifapply']);
 Route::resources([
     'profils'    => ProfilUtilisatersController::class,
     'auth'    => authController::class,

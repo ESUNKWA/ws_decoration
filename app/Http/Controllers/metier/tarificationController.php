@@ -19,8 +19,9 @@ class tarificationController extends Controller
     public function index()
     {
         $liste_tarification = DB::table('t_produits')
-                                ->join('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
+                                ->leftJoin('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
                                 ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
+                                ->where('r_es_utiliser',1)
                                 ->get();
         $response = [
             '_status' =>1,
@@ -80,6 +81,8 @@ class tarificationController extends Controller
                  'r_quantite' => $request->p_quantite,
                  'r_description' => $request->p_description,
                  'r_prix_location' => $request->p_prix_location,
+                 'r_date_debut' => $request->p_date_debut,
+                 'r_date_fin' => $request->p_date_fin,
                  'r_duree' => $request->p_duree,
                  'r_utilisateur' => $request->p_utilisateur
              ]);
@@ -107,7 +110,10 @@ class tarificationController extends Controller
      */
     public function show($idproduit)
     {
-        $tarification = Tarification::where('r_produit',$idproduit)->get();
+        $tarification = Tarification::where('r_produit',$idproduit)
+                                    ->join('t_produits','t_produits.r_i','t_tarifications.r_produit')
+                                    ->select('t_produits.r_libelle','t_tarifications.*')
+                                    ->get();
         $response = [
             '_status' =>1,
             '_result' => $tarification
@@ -147,5 +153,35 @@ class tarificationController extends Controller
     public function destroy(cr $cr)
     {
         //
+    }
+
+    public function tarifapply(request $request){
+        
+        $tarification = Tarification::where('r_produit',$request->p_idproduit)->get();
+
+       $total = count($tarification);
+
+       if( $total >= 1 ){
+            
+            for ($i=0; $i < $total; $i++) { 
+                $tarification[$i]->update([
+                    'r_es_utiliser' => 0
+                ]);
+            }
+
+       }
+       
+       $tarification = Tarification::find($request->p_idtarification);
+       
+       if( $tarification !== null ){
+            $tarification->update([
+            'r_es_utiliser' => $request->p_es_utiliser
+            ]);
+       }
+       $response = [
+        '_status' =>1,
+        '_result' => 'Tarification appliquée avec succès'
+    ];
+        return $response;
     }
 }
