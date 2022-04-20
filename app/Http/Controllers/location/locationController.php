@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\location\Detailslocacation;
+use App\Models\metier\Paiementechellonner;
 
 class locationController extends Controller
 {
@@ -342,5 +343,17 @@ class locationController extends Controller
 
 
 
+    }
+
+    public function add_payment_partiel(Request $request){
+
+        $insert = Paiementechellonner::create([
+            'r_location' => $request->p_location,
+            'r_mnt' => $request->p_mnt,
+            'r_utilisateur' => $request->p_utilisateur,
+            'r_description' => $request->p_description,
+        ]);
+
+        return $insert;
     }
 }

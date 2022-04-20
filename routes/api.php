@@ -25,6 +25,7 @@ Route::post('majstockProduit', [locationController::class, 'majstockProduit']);
 Route::post('majstock', [produitsController::class, 'addStock']);
 Route::get('personneltNotUser', [PersonnelController::class, 'listNotUser']);
 Route::post('tarifapply', [tarificationController::class, 'tarifapply']);
+Route::post('paymentpartiel', [locationController::class, 'add_payment_partiel']);
 Route::resources([
     'profils'    => ProfilUtilisatersController::class,
     'auth'    => authController::class,
