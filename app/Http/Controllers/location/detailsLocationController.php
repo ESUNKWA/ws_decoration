@@ -54,6 +54,7 @@ class detailsLocationController extends Controller
                                 ->join('t_tarifications', 't_produits.r_i', 't_tarifications.r_produit')
                                 ->select('t_details_locations.*', 't_produits.r_libelle as lib_produit', 't_tarifications.r_prix_location')
                                 ->where('t_details_locations.r_location', $idlocation)
+                                ->where('t_tarifications.r_es_utiliser', 1)
                                 ->get();
         $response = [
                        '_status' => 1,

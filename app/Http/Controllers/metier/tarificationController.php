@@ -156,32 +156,45 @@ class tarificationController extends Controller
     }
 
     public function tarifapply(request $request){
-        
-        $tarification = Tarification::where('r_produit',$request->p_idproduit)->get();
 
-       $total = count($tarification);
+        try {
+            DB::beginTransaction();//Début de la transaction
 
-       if( $total >= 1 ){
+            $tarification = Tarification::where('r_produit',$request->p_idproduit)->get();
+
+            $total = count($tarification);
+     
+            if( $total >= 1 ){
+                 
+                 for ($i=0; $i < $total; $i++) { 
+                     $tarification[$i]->update([
+                         'r_es_utiliser' => 0
+                     ]);
+                 }
+     
+            }
             
-            for ($i=0; $i < $total; $i++) { 
-                $tarification[$i]->update([
-                    'r_es_utiliser' => 0
-                ]);
+            $tarification = Tarification::find($request->p_idtarification);
+            
+            if( $tarification !== null ){
+                 $tarification->update([
+                 'r_es_utiliser' => $request->p_es_utiliser
+                 ]);
             }
 
-       }
-       
-       $tarification = Tarification::find($request->p_idtarification);
-       
-       if( $tarification !== null ){
-            $tarification->update([
-            'r_es_utiliser' => $request->p_es_utiliser
-            ]);
-       }
-       $response = [
-        '_status' =>1,
-        '_result' => 'Tarification appliquée avec succès'
-    ];
-        return $response;
+            DB::commit();// Commit
+
+            $response = [
+                '_status' =>1,
+                '_result' => 'Tarification appliquée avec succès'
+                ];
+                return $response;
+        } catch (\Throwable $e) {
+            DB::rollBack(); //Annulation de la transaction
+            return $e->getMessage();
+        }
+        
+        
+      
     }
 }

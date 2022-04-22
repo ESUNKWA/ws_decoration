@@ -5,10 +5,10 @@ namespace App\Models\metier;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Produits extends Model
+class Paiment extends Model
 {
     use HasFactory;
     protected $primaryKey = 'r_i';
-    protected $table = 't_produits';
-    protected $fillable = ['r_categorie','r_libelle','r_description','r_stock','r_image'];
+    protected $table = 't_paiement_echellonner';
+    protected $fillable = ['r_utilisateur ','r_location','r_mnt','r_description'];
 }

@@ -12,10 +12,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\location\Detailslocacation;
 use App\Models\metier\Paiementechellonner;
+use App\Models\metier\Paiment;
 
 class locationController extends Controller
 {
     private $listeLocation;
+    private $partialPayemnt;
     /**
      * Display a listing of the resource.
      *
@@ -33,7 +35,7 @@ class locationController extends Controller
             'p_status.required' => 'Veuillez selectionner le type'
         ];
 
-
+//return $this->paymnt([2]);
         switch ($inputs['p_mode']) {
 
             case 1:
@@ -69,11 +71,18 @@ class locationController extends Controller
 
         }
 
+        
+
         $response = [
             '_status' => 1,
             '_result' => $this->listeLocation
         ];
         return response()->json($response, 200);
+    }
+
+    public function paymnt($data){
+        $pay = Paiment::whereIn('r_location',$data)->get();
+        return $pay;
     }
 
     /**
@@ -94,6 +103,7 @@ class locationController extends Controller
      */
     public function store(Request $request, $mode)
     {
+
         $inputs = $request->all();
 
         $errors = [
@@ -133,82 +143,71 @@ class locationController extends Controller
             return $validator->errors();
         }else{
             $date = date('ym');
-
-            //Insertion des données du client
-            try {
-                //DB::beginTransaction();
-
-                $insertion = client::create([
-                    'r_nom' => $request->p_nom,
-                    'r_prenoms' => $request->p_prenoms,
-                    'r_telephone' => '225'.$request->p_telephone,
-                    'r_email' => $request->p_email,
-                    'r_description' => $request->p_description,
-                    'r_utilisateur' => $request->p_utilisateur,
-                ]);
-
-                //Insertion des données de locations
+            
+            
+               
+                //Insertion des données du client
                 try {
-                    $insertion_location = Location::create([
-                        'r_client' => $insertion->r_i,
-                        'r_num' => ($insertion->r_i < 9 )? $date.'0'.$insertion->r_i : $date.$insertion->r_i ,
-                        'r_mnt_total' => $request->p_mnt_total,
-                        'r_status' => 0,
-                        'r_frais_transport' => $request->p_frais,
-                        'r_destination' => $request->p_commune_arrive,
-                        'r_remise' => $request->p_remise,
-                        'r_mnt_total_remise' =>  $request->p_mnt_total_remise,
-                        'r_logistik' => $request->p_vehicule,
-                        'r_date_envoie' => $request->p_date_envoie,
-                        'r_date_retour' => $request->p_date_retour,
-                        'r_duree' => $request->p_duree,
-                        'r_utilisateur' => $request->p_utilisateur
-                    ]);
-
-                    try {
-                        //dd($request->p_details);
-
-                        for ($i=0; $i < count($request->p_details); $i++) {
-
-                            $insertion_details = Detailslocacation::create([
-                                'r_quantite' => $request->p_details[$i]["qte"],
-                                'r_produit' => $request->p_details[$i]["idproduit"],
-                                'r_location' => $insertion_location->r_i,
-                                'r_sous_total' => $request->p_details[$i]["total"],
-                                'r_utilisateur' => $request->p_utilisateur
-                                //'r_prix_unitaire' => 1000
+                    DB::beginTransaction();//Début de la transaction
+                            //Insertion des informations sur le client
+                            $insertion = client::create([
+                                'r_nom' => $request->p_nom,
+                                'r_prenoms' => $request->p_prenoms,
+                                'r_telephone' => '225'.$request->p_telephone,
+                                'r_email' => $request->p_email,
+                                'r_description' => $request->p_description,
+                                'r_utilisateur' => $request->p_utilisateur,
                             ]);
-                         }
+                            //Insertion des données sur la location
+                            $insertion_location = Location::create([
+                                'r_client' => $insertion->r_i,
+                                'r_num' => ($insertion->r_i < 9 )? $date.'0'.$insertion->r_i : $date.$insertion->r_i ,
+                                'r_mnt_total' => $request->p_mnt_total,
+                                'r_status' => 0,
+                                'r_frais_transport' => $request->p_frais,
+                                'r_destination' => $request->p_commune_arrive,
+                                'r_remise' => $request->p_remise,
+                                'r_mnt_total_remise' =>  $request->p_mnt_total_remise,
+                                'r_logistik' => $request->p_vehicule,
+                                'r_date_envoie' => $request->p_date_envoie,
+                                'r_date_retour' => $request->p_date_retour,
+                                'r_duree' => $request->p_duree,
+                                'r_solder' => $request->p_solder,
+                                'r_utilisateur' => $request->p_utilisateur,
+                                'r_paiement_echell' => json_encode($request->p_paiement)
+                            ]);
 
-                          $res = $this->majstockProduit($request);
+                            //Insertion des détails de la la location
+                            for ($i=0; $i < count($request->p_details); $i++) {
 
-                          
+                                $insertion_details = Detailslocacation::create([
+                                    'r_quantite' => $request->p_details[$i]["qte"],
+                                    'r_produit' => $request->p_details[$i]["idproduit"],
+                                    'r_location' => $insertion_location->r_i,
+                                    'r_sous_total' => $request->p_details[$i]["total"],
+                                    'r_utilisateur' => $request->p_utilisateur
+                                    //'r_prix_unitaire' => 1000
+                                ]);
+                            }
+                            $request['p_location'] = $insertion_location->r_i;
+                            $res = $this->majstockProduit($request);
 
-                         $response = [
-                            '_status' => 1,
-                            '_result' => 'Enregistrement effectuée avec succès'
-                        ];
-                        return response()->json($response, 200);
+                            //Insertion pariement partiel
 
-                         //return response()->json($response, 200);
-
-                    } catch (\Throwable $e) {
-
-                        return $e->getMessage();
-                    }
-
-
-
+                            if ($request->p_solder == false) {
+                                $this->add_payment_partiel($request);
+                            }
+                            DB::commit();// Commit
+                            $response = [
+                                '_status' => 1,
+                                '_result' => 'Enregistrement effectuée avec succès'
+                            ];
+                            return response()->json($response, 200);
+                           
                 } catch (\Throwable $e) {
-
+                    DB::rollBack(); //Annulation de la transaction
                     return $e->getMessage();
                 }
-
-                //DB::commit();
-            } catch (\Throwable $e) {
-                //DB::rollBack();
-                return $e->getMessage();
-            }
         }
     }
 
@@ -351,11 +350,12 @@ class locationController extends Controller
 
         $insert = Paiementechellonner::create([
             'r_location' => $request->p_location,
-            'r_mnt' => $request->p_mnt,
+            'r_mnt' => $request->p_solder,
             'r_utilisateur' => $request->p_utilisateur,
             'r_description' => $request->p_description,
         ]);
 
-        return $insert;
+        return $insert->r_i;
+
     }
 }
