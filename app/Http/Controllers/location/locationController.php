@@ -71,7 +71,7 @@ class locationController extends Controller
 
         }
 
-        
+
 
         $response = [
             '_status' => 1,
@@ -143,9 +143,9 @@ class locationController extends Controller
             return $validator->errors();
         }else{
             $date = date('ym');
-            
-            
-               
+
+
+
                 //Insertion des données du client
                 try {
                     DB::beginTransaction();//Début de la transaction
@@ -192,18 +192,13 @@ class locationController extends Controller
                             $request['p_location'] = $insertion_location->r_i;
                             $res = $this->majstockProduit($request);
 
-                            //Insertion pariement partiel
-
-                            if ($request->p_solder == false) {
-                                $this->add_payment_partiel($request);
-                            }
                             DB::commit();// Commit
                             $response = [
                                 '_status' => 1,
                                 '_result' => 'Enregistrement effectuée avec succès'
                             ];
                             return response()->json($response, 200);
-                           
+
                 } catch (\Throwable $e) {
                     DB::rollBack(); //Annulation de la transaction
                     return $e->getMessage();
@@ -346,14 +341,14 @@ class locationController extends Controller
 
     }
 
-    public function add_payment_partiel(Request $request){
+    public function add_payment(Request $request){
 
-        $insert = Paiementechellonner::create([
-            'r_location' => $request->p_location,
-            'r_mnt' => $request->p_solder,
-            'r_utilisateur' => $request->p_utilisateur,
-            'r_description' => $request->p_description,
+        $insert = Location::find($request->p_idlocation);
+
+        $insert->update([
+            'r_paiement_echell' => json_encode($request->p_paiement)
         ]);
+
 
         return $insert->r_i;
 
