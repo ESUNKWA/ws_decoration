@@ -189,6 +189,7 @@ class locationController extends Controller
                                     //'r_prix_unitaire' => 1000
                                 ]);
                             }
+
                             $request['p_location'] = $insertion_location->r_i;
                             $res = $this->majstockProduit($request);
 
@@ -216,6 +217,7 @@ class locationController extends Controller
     {
         //
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -263,6 +265,7 @@ class locationController extends Controller
 
                     case 2:
                         $t = $this->majstockProduit($request);
+                        $this->add_qte_manquant($request);
                         $p = 'Location terminée';
                         break;
 
@@ -304,6 +307,21 @@ class locationController extends Controller
         //
     }
 
+    
+    public function add_qte_manquant(Request $request){
+        $tabs = $request->p_details;
+        $signe = $request->p_signe;
+        foreach( $tabs as $val ){
+
+           $qteManquant = Detailslocacation::find($val['p_iddLocation']);
+    
+           $qteManquant->update([
+            'r_produit_manquant' => $val['qteManquant']
+         ]);
+       }
+       return $qteManquant;
+   }
+
     public function majstockProduit(Request $request){
 
         $tabs = $request->p_details;
@@ -312,7 +330,7 @@ class locationController extends Controller
         try{
 
             foreach( $tabs as $val ){
-
+           
                 $produit = Produits::find($val['idproduit']);
 
                 $tt = intval($produit['r_stock']) . $signe . intval($val['qte']); // Former une équation de chaîne
@@ -320,7 +338,7 @@ class locationController extends Controller
                 $p = eval('return '.$tt.';'); // Évaluation de l'équation
 
                 $produit->update([
-                   'r_stock' => $p
+                   'r_stock' => $p,
                 ]);
 
             }
@@ -342,15 +360,33 @@ class locationController extends Controller
     }
 
     public function add_payment(Request $request){
+        //Début de la transaction
+        
 
         $insert = Location::find($request->p_idlocation);
+        try {
+            DB::beginTransaction();
+            //Mise à jours du status de paiement
+            if( $insert->r_mnt_total_remise == $request->p_mnt_total_paie ){
+                $insert->update([
+                    'r_solder' => 1,
+                    'r_paiement_echell' => json_encode($request->p_paiement)
+                ]);
+            }else{
+                //Insertion des payments
+                $insert->update([
+                    'r_paiement_echell' => json_encode($request->p_paiement)
+                ]);
+            }
 
-        $insert->update([
-            'r_paiement_echell' => json_encode($request->p_paiement)
-        ]);
+            DB::commit();// Commit
 
+            return $insert;
 
-        return $insert->r_i;
-
+        } catch (\Throwable $e) {
+            DB::rollBack(); //Annulation de la transaction
+            return $e->getMessage();
+        }
+        
     }
 }
