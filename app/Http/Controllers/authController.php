@@ -55,7 +55,7 @@ class authController extends Controller
         if( $validate->fails() ){
             return $validate->errors();
         }
-
+        //Récuperation des infos des utilisateurs
         $login = DB::table('t_utilisateurs')
                     ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
                     ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
@@ -66,21 +66,33 @@ class authController extends Controller
 
         if( count($login) >= 1){
 
-            if( $login[0]->r_actif == 1 ){
+            switch( $login[0]->r_actif ){
 
-                $response = [
-                    '_status' => 1,
-                    '_result' => $login,
-                ];
+                case 0:
+                    $users = Utilisateurs::find($login[0]->r_i);
 
-            }else{
+                    $users->update([
+                        'r_actif' => 1
+                    ]);
 
-                $response = [
-                    '_status' => -100,
-                    '_result' => "Ce compte est déjà en cours d'utilisation",
-                ];
+                    $response = [
+                        '_status' => 1,
+                        '_result' => $login,
+                    ];
 
+                    break;
+
+                case 1:
+                    $response = [
+                        '_status' => -100,
+                        '_result' => "Ce compte est déjà en cours d'utilisation",
+                    ];
+                    break;
+
+                default:
+                    break;
             }
+
             return response()->json($response, 200);
         }else{
             return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
@@ -130,5 +142,15 @@ class authController extends Controller
     public function destroy(rc $rc)
     {
         //
+    }
+
+    public function deconnect(Request $request){
+
+        $users = Utilisateurs::findOrfail($request->idUtilisateur);
+
+        $users->update([
+                'r_actif' => 0
+        ]);
+        return $users->_r_i;
     }
 }

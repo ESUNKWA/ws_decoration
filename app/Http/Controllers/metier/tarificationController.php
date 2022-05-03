@@ -35,11 +35,16 @@ class tarificationController extends Controller
 //dd($request->p_idproduit);
         $data = DB::table('t_produits')
                 ->leftJoin('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
-                ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
-                ->whereNotIn('t_produits.r_i',$request->p_idproduit)
+                ->select('t_produits.r_i as id','t_produits.r_libelle as label','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
+                ->whereNotIn('t_produits.r_i',$request->p_idproduits)
+                ->where('r_es_utiliser',1)
                 ->get();
 
-        return $data;
+                $response = [
+                    '_status' =>1,
+                    '_result' => $data
+                ];
+                return response()->json($response, 200);
     }
 
     /**
