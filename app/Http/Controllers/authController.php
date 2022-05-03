@@ -49,9 +49,6 @@ class authController extends Controller
             'p_mdp.required' => 'Veuillez saisir votre mot de passe',
         ];
 
-
-
-
         $validate = Validator::make($request->all(), $errors, $erreurs);
 
 
@@ -62,24 +59,31 @@ class authController extends Controller
         $login = DB::table('t_utilisateurs')
                     ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
                     ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
-                    ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_profils.r_libelle as profil')
+                    ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_profils.r_libelle as profil','t_utilisateurs.r_actif')
                     ->where('r_login', $request->p_login)
                     ->where('password', MD5($request->p_mdp))
                     ->get();
 
+        if( count($login) >= 1){
 
-        if( count($login) >= 1 ){
+            if( $login[0]->r_actif == 1 ){
 
-            $response = [
-                '_status' => 1,
-                '_result' => $login,
-            ];
+                $response = [
+                    '_status' => 1,
+                    '_result' => $login,
+                ];
+
+            }else{
+
+                $response = [
+                    '_status' => -100,
+                    '_result' => "Ce compte est déjà en cours d'utilisation",
+                ];
+
+            }
             return response()->json($response, 200);
-
         }else{
-
-            return response()->json(['status'=>0, 'result'=>'Login ou Mot de passe incorrecte !']);
-
+            return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
         }
     }
 

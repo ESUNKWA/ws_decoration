@@ -10,6 +10,6 @@ class Utilisateurs extends Model
     use HasFactory;
     protected $primaryKey = 'r_i';
     protected $table = 't_utilisateurs';
-    protected $fillable = ['r_personnel','r_profil','r_login','password','r_utilisateur','r_status'];
+    protected $fillable = ['r_personnel','r_profil','r_login','password','r_utilisateur','r_status','r_actif'];
 
 }

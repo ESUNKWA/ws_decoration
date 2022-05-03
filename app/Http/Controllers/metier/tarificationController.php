@@ -21,13 +21,25 @@ class tarificationController extends Controller
         $liste_tarification = DB::table('t_produits')
                                 ->leftJoin('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
                                 ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
-                                ->where('r_es_utiliser',1)
+                                ->where('t_tarifications.r_es_utiliser',1)
                                 ->get();
         $response = [
             '_status' =>1,
             '_result' => $liste_tarification
         ];
         return response()->json($response, 200);
+    }
+
+    public function tarification_cibles(Request $request){
+
+//dd($request->p_idproduit);
+        $data = DB::table('t_produits')
+                ->leftJoin('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
+                ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
+                ->whereNotIn('t_produits.r_i',$request->p_idproduit)
+                ->get();
+
+        return $data;
     }
 
     /**
@@ -66,9 +78,9 @@ class tarificationController extends Controller
              'p_duree.required'  => 'La durée est obligatoire',
              'p_utilisateur.required' => 'Utilisateur inconnu',
          ];
- 
+
          $validator = Validator::make($inputs,$errors, $erreurs);
- 
+
          if( $validator->fails() ){
              $response = [
                  '_status' =>-100,
@@ -98,7 +110,7 @@ class tarificationController extends Controller
                  '_result' => 'Une erreur est survenue lors de l\'enregistrement'
              ];
          }
- 
+
          return response()->json($response, 200);
     }
 
@@ -163,19 +175,19 @@ class tarificationController extends Controller
             $tarification = Tarification::where('r_produit',$request->p_idproduit)->get();
 
             $total = count($tarification);
-     
+
             if( $total >= 1 ){
-                 
-                 for ($i=0; $i < $total; $i++) { 
+
+                 for ($i=0; $i < $total; $i++) {
                      $tarification[$i]->update([
                          'r_es_utiliser' => 0
                      ]);
                  }
-     
+
             }
-            
+
             $tarification = Tarification::find($request->p_idtarification);
-            
+
             if( $tarification !== null ){
                  $tarification->update([
                  'r_es_utiliser' => $request->p_es_utiliser
@@ -193,8 +205,8 @@ class tarificationController extends Controller
             DB::rollBack(); //Annulation de la transaction
             return $e->getMessage();
         }
-        
-        
-      
+
+
+
     }
 }
