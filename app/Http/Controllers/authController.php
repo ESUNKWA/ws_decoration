@@ -151,6 +151,6 @@ class authController extends Controller
         $users->update([
                 'r_actif' => 0
         ]);
-        return $users->_r_i;
+        return ($users->r_i)? true : false;
     }
 }
