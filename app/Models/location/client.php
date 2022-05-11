@@ -10,5 +10,5 @@ class client extends Model
     use HasFactory;
     protected $primaryKey = 'r_i';
     protected $table = 't_clients';
-    protected $fillable = ['r_i','r_nom','r_prenoms','r_telephone','r_email','r_description','r_utilisateur'];
+    protected $fillable = ['r_nom','r_prenoms','r_telephone','r_email','r_description','r_utilisateur'];
 }

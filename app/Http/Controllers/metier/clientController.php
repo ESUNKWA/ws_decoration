@@ -131,9 +131,9 @@ class clientController extends Controller
      * @param  \App\Models\cr  $cr
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, cr $cr)
+    public function update(Request $request, $id)
     {
-        //
+        $inputs = $request->all();
     }
 
     /**

@@ -20,7 +20,7 @@ class tarificationController extends Controller
     {
         $liste_tarification = DB::table('t_produits')
                                 ->leftJoin('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
-                                ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
+                                ->select('t_produits.r_i as idproduit','t_produits.r_libelle','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree','t_tarifications.r_quantite')
                                 ->where('t_tarifications.r_es_utiliser',1)
                                 ->get();
         $response = [
@@ -35,7 +35,7 @@ class tarificationController extends Controller
 //dd($request->p_idproduit);
         $data = DB::table('t_produits')
                 ->leftJoin('t_tarifications', 't_produits.r_i', '=', 't_tarifications.r_produit')
-                ->select('t_produits.r_i as id','t_produits.r_libelle as label','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree',)
+                ->select('t_produits.r_i as id','t_produits.r_libelle as label','t_produits.r_stock','t_tarifications.r_prix_location','t_tarifications.r_duree','t_tarifications.r_quantite')
                 ->whereNotIn('t_produits.r_i',$request->p_idproduits)
                 ->where('r_es_utiliser',1)
                 ->get();
