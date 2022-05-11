@@ -22,6 +22,7 @@ class dashController extends Controller
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 1 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_val,
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 3 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_rej,
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 0 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_att,
+        (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 2 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_term,
         /*(SELECT JSON_ARRAYAGG(JSON_OBJECT('produit', r_libelle, 'stock', r_stock)) from t_produits) as produits,*/
         (SELECT COUNT(r_i) FROM t_locations WHERE /*t_locations.r_status = 0 AND*/ DATE(t_locations.r_date_envoie) = DATE(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY))) as nbreLivraisonDemain,
         (SELECT COUNT(r_i) FROM t_locations WHERE /*t_locations.r_status = 0 AND*/ DATE(t_locations.r_date_envoie) = DATE(DATE_ADD(CURRENT_DATE, INTERVAL 0 DAY))) as nbreLivraisonJour,
@@ -31,16 +32,21 @@ class dashController extends Controller
 
     //$LocationStatus = DB::select("SELECT COUNT(r_i), SUM(r_mnt_total_remise) FROM `t_locations` GROUP BY r_status");
     $LocationStatus = DB::select("SELECT COUNT(loc.r_i) as nbre, SUM(r_mnt_total_remise) as total from t_locations loc WHERE MONTH(loc.created_at) = MONTH(NOW()) GROUP BY r_status");
-
-    $produitStat = DB::select("SELECT prd.r_libelle as produit, SUM(det.r_sous_total) as total FROM t_produits prd
+    
+    //Statistique des locations mensuelles par produits
+    $produitStat = DB::select("SELECT prd.r_libelle as produit, CONVERT(SUM(det.r_sous_total),INTEGER) as total FROM t_produits prd
     INNER JOIN t_details_locations det ON prd.r_i = det.r_produit
     INNER JOIN t_locations loc ON loc.r_i = det.r_location
     WHERE loc.r_status NOT IN(0,3)
+    AND MONTH(loc.created_at) = MONTH(NOW())
     GROUP BY prd.r_libelle ORDER BY total DESC");
+
+    $a = DB::select('SELECT MONTH(loc.created_at) as mois, CONVERT(SUM(loc.r_mnt_total_remise),INTEGER) as total FROM t_locations loc
+WHERE loc.r_status NOT IN (0,3) GROUP BY MONTH(loc.created_at) ORDER BY MONTH(loc.created_at) ASC');
 
     $mnt_total = DB::select("SELECT loc.r_paiement_echell from t_locations loc");
 
-    return array_merge([$dash, $LocationStatus, $produitStat,$mnt_total]);
+    return array_merge([$dash, $LocationStatus, $produitStat,$mnt_total,$a]);
 
     }
 
