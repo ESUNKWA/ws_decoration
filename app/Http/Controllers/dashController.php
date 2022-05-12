@@ -18,7 +18,9 @@ class dashController extends Controller
         $dash = DB::select("SELECT COALESCE(CONVERT(SUM(loc.r_mnt_total_remise),INTEGER),0) as r_mnt_total_mois,
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois,
         (SELECT COALESCE(CONVERT(SUM(ach.r_prix_achat),INTEGER),0) from t_achats_produits ach WHERE MONTH(ach.created_at) = MONTH(NOW())) as total_achat_mois,
-        (SELECT COALESCE(CONVERT(SUM(loc.r_mnt_total_remise),INTEGER),0) from t_locations loc WHERE loc.r_status NOT IN(0,3) AND loc.r_solder = 1 AND DATE(loc.created_at) = DATE(NOW())) as total_location_jours,
+        (SELECT COALESCE(CONVERT(SUM(loc.r_mnt_total_remise),INTEGER),0) from t_locations loc WHERE loc.r_status NOT IN(0,3) AND loc.r_solder = 1 
+AND loc.r_paiement_echell = 'null' AND (DATE(loc.created_at) = DATE(NOW()) || DATE(loc.updated_at) = DATE(NOW()))) as total_location_jours,
+        
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 1 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_val,
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 3 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_rej,
         (SELECT COUNT(loc.r_i) from t_locations loc WHERE loc.r_status = 0 AND MONTH(loc.created_at) = MONTH(NOW())) as total_location_mois_att,
@@ -44,7 +46,7 @@ class dashController extends Controller
     $a = DB::select('SELECT MONTH(loc.created_at) as mois, CONVERT(SUM(loc.r_mnt_total_remise),INTEGER) as total FROM t_locations loc
 WHERE loc.r_status NOT IN (0,3) GROUP BY MONTH(loc.created_at) ORDER BY MONTH(loc.created_at) ASC');
 
-    $mnt_total = DB::select("SELECT loc.r_paiement_echell from t_locations loc");
+    $mnt_total = DB::select("SELECT loc.r_paiement_echell from t_locations loc where loc.r_paiement_echell <> 'null' ");
 
     return array_merge([$dash, $LocationStatus, $produitStat,$mnt_total,$a]);
 
