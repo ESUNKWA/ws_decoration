@@ -16,6 +16,7 @@ use App\Http\Controllers\metier\achatproduitController;
 use App\Http\Controllers\metier\tarificationController;
 use App\Http\Controllers\personnel\PersonnelController;
 use App\Http\Controllers\location\detailsLocationController;
+use App\Http\Controllers\metier\PenaliteController;
 
 Route::put('profil/edit/{idprofil}', [ProfilUtilisatersController::class, 'modif']);
 Route::post('location/{proforma}', [locationController::class, 'store']);
@@ -49,4 +50,8 @@ Route::resources([
     'personnel' => PersonnelController::class,
     //Client
     'clients' => clientController::class,
+
+    //Pénalité
+    'penalite' => PenaliteController::class,
+
 ]);
