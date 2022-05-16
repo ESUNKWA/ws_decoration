@@ -111,9 +111,57 @@ class penaliteController extends Controller
      * @param  \App\Models\cr  $cr
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, cr $cr)
+    public function update(Request $request, $idlocation)
     {
-        //
+        $inputs = $request->all();
+        
+        // Validation des champs
+        $errors = [
+            'p_mnt'  => 'required',
+            'p_motif'  => 'required',
+            'p_utilisateur' => 'required'
+        ];
+        $erreurs = [
+            'p_mnt.required' =>'Veuillez saisir le montant',
+            'p_motif.unique' =>'Veuillez saisir le motif de la pénalité',
+            'p_utilisateur.required'  => 'Veuillez préciser l\'utilisateur'
+        ];
+
+        $validate = Validator::make($inputs, $errors, $erreurs);
+
+        if( $validate->fails()){
+            $response = [
+                '_status' =>-100,
+                '_result' => $validate->errors()
+            ];
+            return $response;
+        }else{
+          $update = Penalite::find($idlocation);
+          
+          if( $update !== null ){
+              
+                $update->update([
+                    'r_mnt' => $request->p_mnt,
+                    'r_motif' => $request->p_motif,
+                    'r_utilisateur' => $request->p_utilisateur
+                ]);
+
+                $response = [
+                    '_status' => 1,
+                    '_result' => 'Modification effectuée avec succès'
+                ];
+               
+          }else{
+
+                $response = [
+                    '_status' => 1,
+                    '_result' => 'Une erreur est survenue lors de l\'enregistrement'
+                ];
+            
+          }
+                
+                return response()->json($response, 200);
+        }
     }
 
     /**
