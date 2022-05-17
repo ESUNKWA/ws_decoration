@@ -43,8 +43,9 @@ class locationController extends Controller
                 ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
                 ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
                 ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
+                ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
                 ->select('t_clients.r_i as idclient','t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_clients.r_email','t_clients.r_description','t_clients.r_utilisateur',
-                't_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule')
+                't_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite')
                 ->where('t_locations.r_status', DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
                 ->whereDate('t_locations.r_date_envoie', '=', $inputs['p_date'])
                 ->get();
@@ -55,7 +56,8 @@ class locationController extends Controller
                 ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
                 ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
                 ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
-                ->select('t_clients.*','t_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule')
+                ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
+                ->select('t_clients.*','t_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite')
                 ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
                 ->whereDate('t_locations.r_date_retour', '=', $inputs['p_date'])
                 ->get();
@@ -66,7 +68,8 @@ class locationController extends Controller
                 ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
                 ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
                 ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
-                ->select('t_clients.*','t_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule')
+                ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
+                ->select('t_clients.*','t_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite')
                 ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
                 ->whereDate('t_locations.r_date_envoie', '>=', $inputs['p_date'])
                 ->whereDate('t_locations.r_date_retour', '<=', $inputs['p_date_retour'])

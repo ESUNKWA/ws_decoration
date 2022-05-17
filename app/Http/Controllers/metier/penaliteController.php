@@ -86,10 +86,23 @@ class penaliteController extends Controller
     public function show($idlocation)
     {
         $listePenalite = Penalite::where('r_location',$idlocation)->get();
-        $response = [
-            '_status' => 1,
-            '_result' => $listePenalite
-        ];
+        
+        try {
+            if( count($listePenalite) >= 1 ){
+
+                $response = [
+                    '_status' => 1,
+                    '_result' => $listePenalite
+                ];
+            }else{
+                $response = [
+                    '_status' => 0,
+                    '_result' => $listePenalite
+                ];
+            }
+        } catch (\Throwable $e) {
+            return $e->getMessage();
+        }
         return response()->json($response, 200);
     }
 
@@ -154,7 +167,7 @@ class penaliteController extends Controller
           }else{
 
                 $response = [
-                    '_status' => 1,
+                    '_status' => 0,
                     '_result' => 'Une erreur est survenue lors de l\'enregistrement'
                 ];
             
