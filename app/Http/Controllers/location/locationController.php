@@ -35,49 +35,61 @@ class locationController extends Controller
             'p_status.required' => 'Veuillez selectionner le type'
         ];
 
-//return $this->paymnt([2]);
-        switch ($inputs['p_mode']) {
+        //return $this->paymnt([2]);
+                
+        try{
+            switch ($inputs['p_mode']) {
 
-            case 1:
+                case 1:
+                    $this->listeLocation = DB::table('t_clients')
+                    ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+                    ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+                    ->join('t_utilisateurs', 't_utilisateurs.r_i', '=', 't_locations.r_utilisateur')
+                    ->join('t_personnels', 't_personnels.r_i', '=', 't_utilisateurs.r_personnel')
+                    ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
+                    ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
+                    ->select('t_clients.r_i as idclient','t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_clients.r_email','t_clients.r_description',
+                    't_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite','t_personnels.r_nom as nom_person_eng','t_personnels.r_prenoms as prenoms_person_engg')
+                    ->where('t_locations.r_status', DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
+                    ->whereDate('t_locations.r_date_envoie', '=', $inputs['p_date'])
+                    ->get();
+                    break;
+    
+                case 2:
+                    $this->listeLocation = DB::table('t_clients')
+                    ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+                    ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+                    ->join('t_utilisateurs', 't_utilisateurs.r_i', '=', 't_locations.r_utilisateur')
+                    ->join('t_personnels', 't_personnels.r_i', '=', 't_utilisateurs.r_personnel')
+                    ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
+                    ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
+                    ->select('t_clients.r_i as idclient','t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_clients.r_email','t_clients.r_description',
+                    't_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite','t_personnels.r_nom as nom_person_eng','t_personnels.r_prenoms as prenoms_person_engg')
+                    ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
+                    ->whereDate('t_locations.r_date_retour', '=', $inputs['p_date'])
+                    ->get();
+                    break;
+    
+                default:
                 $this->listeLocation = DB::table('t_clients')
-                ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
-                ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
-                ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
-                ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
-                ->select('t_clients.r_i as idclient','t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_clients.r_email','t_clients.r_description','t_clients.r_utilisateur',
-                't_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite')
-                ->where('t_locations.r_status', DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
-                ->whereDate('t_locations.r_date_envoie', '=', $inputs['p_date'])
-                ->get();
+                    ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
+                    ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
+                    ->join('t_utilisateurs', 't_utilisateurs.r_i', '=', 't_locations.r_utilisateur')
+                    ->join('t_personnels', 't_personnels.r_i', '=', 't_utilisateurs.r_personnel')
+                    ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
+                    ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
+                    ->select('t_clients.r_i as idclient','t_clients.r_nom','t_clients.r_prenoms','t_clients.r_telephone','t_clients.r_email','t_clients.r_description',
+                    't_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite','t_personnels.r_nom as nom_person_eng','t_personnels.r_prenoms as prenoms_person_engg')
+                    ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
+                    ->whereDate('t_locations.r_date_envoie', '>=', $inputs['p_date'])
+                    ->whereDate('t_locations.r_date_retour', '<=', $inputs['p_date_retour'])
+                    ->get();
                 break;
-
-            case 2:
-                $this->listeLocation = DB::table('t_clients')
-                ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
-                ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
-                ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
-                ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
-                ->select('t_clients.*','t_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite')
-                ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
-                ->whereDate('t_locations.r_date_retour', '=', $inputs['p_date'])
-                ->get();
-                break;
-
-            default:
-            $this->listeLocation = DB::table('t_clients')
-                ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
-                ->join('t_communes', 't_communes.r_i', '=', 't_locations.r_destination')
-                ->leftJoin('t_logistiques', 't_logistiques.r_i', '=', 't_locations.r_logistik')
-                ->leftJoin('t_penalite', 't_locations.r_i', '=', 't_penalite.r_location')
-                ->select('t_clients.*','t_locations.*','t_communes.r_libelle as destination','t_logistiques.r_vehicule','t_logistiques.r_matricule','t_penalite.r_i as penalite')
-                ->where('t_locations.r_status',DB::raw('COALESCE('.$inputs['p_status'].',t_locations.r_status)'))
-                ->whereDate('t_locations.r_date_envoie', '>=', $inputs['p_date'])
-                ->whereDate('t_locations.r_date_retour', '<=', $inputs['p_date_retour'])
-                ->get();
-            break;
-
+    
+            }
+        }catch(\Throwable $e){
+            return $e->getMessage();
         }
-
 
 
         $response = [
@@ -87,10 +99,10 @@ class locationController extends Controller
         return response()->json($response, 200);
     }
 
-    public function paymnt($data){
-        $pay = Paiment::whereIn('r_location',$data)->get();
-        return $pay;
-    }
+        public function paymnt($data){
+            $pay = Paiment::whereIn('r_location',$data)->get();
+            return $pay;
+        }
 
     /**
      * Show the form for creating a new resource.

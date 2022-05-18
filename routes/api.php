@@ -14,7 +14,7 @@ use App\Http\Controllers\ProfilUtilisatersController;
 use App\Http\Controllers\personnel\fonctionController;
 use App\Http\Controllers\metier\achatproduitController;
 use App\Http\Controllers\metier\tarificationController;
-use App\Http\Controllers\personnel\PersonnelController;
+use App\Http\Controllers\personnel\personnelController;
 use App\Http\Controllers\location\detailsLocationController;
 use App\Http\Controllers\metier\PenaliteController;
 
@@ -25,7 +25,7 @@ Route::post('location', [locationController::class, 'index']);
 Route::post('updatestatlocation', [locationController::class, 'updateStat']);
 Route::post('majstockProduit', [locationController::class, 'majstockProduit']);
 Route::post('majstock', [produitsController::class, 'addStock']);
-Route::get('personneltNotUser', [PersonnelController::class, 'listNotUser']);
+Route::get('personneltNotUser', [personnelController::class, 'listNotUser']);
 Route::post('tarifapply', [tarificationController::class, 'tarifapply']);
 Route::post('paymentpartiel', [locationController::class, 'add_payment']);
 Route::post('tarification_cibles', [tarificationController::class, 'tarification_cibles']);
@@ -47,7 +47,7 @@ Route::resources([
     'dash' => dashController::class,
     //Personnel
     'fonction' => fonctionController::class,
-    'personnel' => PersonnelController::class,
+    'personnel' => personnelController::class,
     //Client
     'clients' => clientController::class,
 
