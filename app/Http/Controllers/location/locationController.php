@@ -201,11 +201,12 @@ class locationController extends Controller
 
                                 $insertion_details = Detailslocacation::create([
                                     'r_quantite' => $request->p_details[$i]["qte"],
+                                    'r_prix_location' => $request->p_details[$i]["prixlocation"],
                                     'r_produit' => $request->p_details[$i]["idproduit"],
                                     'r_location' => $insertion_location->r_i,
                                     'r_sous_total' => $request->p_details[$i]["total"],
                                     'r_utilisateur' => $request->p_utilisateur
-                                    //'r_prix_unitaire' => 1000
+                                    
                                 ]);
                             }
 

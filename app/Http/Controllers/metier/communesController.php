@@ -18,7 +18,7 @@ class communesController extends Controller
      */
     public function index()
     {
-        $listeCommunes = DB::select('select r_i as value, r_libelle as label, created_at from t_communes');
+        $listeCommunes = DB::select('select r_i as value, r_libelle as label, created_at from t_communes order by r_libelle');
         $response = [
             '_status' => 1,
             '_result' => $listeCommunes

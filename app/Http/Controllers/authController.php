@@ -66,33 +66,36 @@ class authController extends Controller
 
         if( count($login) >= 1){
 
-            switch( $login[0]->r_actif ){
+            // switch( $login[0]->r_actif ){
 
-                case 0:
-                    $users = Utilisateurs::find($login[0]->r_i);
+            //     case 0:
+            //         $users = Utilisateurs::find($login[0]->r_i);
 
-                    $users->update([
-                        'r_actif' => 1
-                    ]);
+            //         $users->update([
+            //             'r_actif' => 1
+            //         ]);
 
-                    $response = [
-                        '_status' => 1,
-                        '_result' => $login,
-                    ];
+            //         $response = [
+            //             '_status' => 1,
+            //             '_result' => $login,
+            //         ];
 
-                    break;
+            //         break;
 
-                case 1:
-                    $response = [
-                        '_status' => -100,
-                        '_result' => "Ce compte est déjà en cours d'utilisation",
-                    ];
-                    break;
+            //     case 1:
+            //         $response = [
+            //             '_status' => -100,
+            //             '_result' => "Ce compte est déjà en cours d'utilisation",
+            //         ];
+            //         break;
 
-                default:
-                    break;
-            }
-
+            //     default:
+            //         break;
+            // }
+            $response = [
+                '_status' => 1,
+                '_result' => $login
+            ];
             return response()->json($response, 200);
         }else{
             return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
