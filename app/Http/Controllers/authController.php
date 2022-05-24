@@ -59,7 +59,7 @@ class authController extends Controller
         $login = DB::table('t_utilisateurs')
                     ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
                     ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
-                    ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_utilisateurs.r_actif')
+                    ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.r_actif')
                     ->where('r_login', $request->p_login)
                     ->where('password', MD5($request->p_mdp))
                     ->get();
