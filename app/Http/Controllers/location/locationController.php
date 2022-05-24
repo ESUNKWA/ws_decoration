@@ -36,7 +36,7 @@ class locationController extends Controller
         ];
 
         //return $this->paymnt([2]);
-                
+
         try{
             switch ($inputs['p_mode']) {
 
@@ -54,7 +54,7 @@ class locationController extends Controller
                     ->whereDate('t_locations.r_date_envoie', '=', $inputs['p_date'])
                     ->get();
                     break;
-    
+
                 case 2:
                     $this->listeLocation = DB::table('t_clients')
                     ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
@@ -69,7 +69,7 @@ class locationController extends Controller
                     ->whereDate('t_locations.r_date_retour', '=', $inputs['p_date'])
                     ->get();
                     break;
-    
+
                 default:
                 $this->listeLocation = DB::table('t_clients')
                     ->join('t_locations', 't_clients.r_i', '=', 't_locations.r_client')
@@ -85,7 +85,7 @@ class locationController extends Controller
                     ->whereDate('t_locations.r_date_retour', '<=', $inputs['p_date_retour'])
                     ->get();
                 break;
-    
+
             }
         }catch(\Throwable $e){
             return $e->getMessage();
@@ -201,12 +201,12 @@ class locationController extends Controller
 
                                 $insertion_details = Detailslocacation::create([
                                     'r_quantite' => $request->p_details[$i]["qte"],
-                                    'r_prix_location' => $request->p_details[$i]["prixlocation"],
+                                    'r_prix_location' => $request->p_details[$i]["r_prix_location"],
                                     'r_produit' => $request->p_details[$i]["idproduit"],
                                     'r_location' => $insertion_location->r_i,
                                     'r_sous_total' => $request->p_details[$i]["total"],
                                     'r_utilisateur' => $request->p_utilisateur
-                                    
+
                                 ]);
                             }
 
@@ -245,7 +245,7 @@ class locationController extends Controller
 
         $erreurs = [
             'p_details.required' => 'Veuillez saisir les détails de la location',
-            
+
             'p_date_envoie.required' => 'Veuillez saisir la date d\'envoie',
             'p_date_retour.required' => 'Veuillez saisir la date de retour',
             'p_commune_depart.required' => 'La commune de départ est inconnue',
@@ -260,18 +260,18 @@ class locationController extends Controller
             return $validator->errors();
         }else{
             $date = date('ym');
-            
+
                 //Insertion des données du client
                 try {
                     DB::beginTransaction();
                     $location = Location::find($inputs['p_idlocation']);
-               
+
                             //Insertion des données sur la location
                             $location->update([
                                 //'r_client' => $insertion->r_i,
                                 //'r_num' => ($insertion->r_i < 9 )? $date.'0'.$insertion->r_i : $date.$insertion->r_i ,
                                 'r_mnt_total' => $request->p_mnt_total,
-                                
+
                                 'r_frais_transport' => $request->p_frais,
                                 'r_destination' => $request->p_commune_arrive,
                                 'r_remise' => $request->p_remise,
@@ -281,9 +281,9 @@ class locationController extends Controller
                                 'r_date_retour' => $request->p_date_retour,
                                 'r_duree' => $request->p_duree,
                             ]);
-                          
+
                            $detail_location = Detailslocacation::where('r_location',$inputs['p_idlocation'])->delete();
-                           
+
                            if ( $detail_location !== 0) {
                                //Insertion des détails de la la location
                                 for ($i=0; $i < count($request->p_details); $i++) {
@@ -299,7 +299,7 @@ class locationController extends Controller
                                 }
                            }
 
-                            
+
 
                             $request['p_location'] = $location->r_i;
                             //$res = $this->majstockProduit($request);
@@ -418,14 +418,14 @@ class locationController extends Controller
         //
     }
 
-    
+
     public function add_qte_manquant(Request $request){
         $tabs = $request->p_details;
         $signe = $request->p_signe;
         foreach( $tabs as $val ){
 
            $qteManquant = Detailslocacation::find($val['p_iddLocation']);
-    
+
            $qteManquant->update([
             'r_produit_manquant' => $val['qteManquant']
          ]);
@@ -441,7 +441,7 @@ class locationController extends Controller
         try{
 
             foreach( $tabs as $val ){
-           
+
                 $produit = Produits::find($val['idproduit']);
 
                 $tt = intval($produit['r_stock']) . $signe . intval($val['qte']); // Former une équation de chaîne
@@ -472,7 +472,7 @@ class locationController extends Controller
 
     public function add_payment(Request $request){
         //Début de la transaction
-        
+
 
         $insert = Location::find($request->p_idlocation);
         try {
@@ -498,6 +498,6 @@ class locationController extends Controller
             DB::rollBack(); //Annulation de la transaction
             return $e->getMessage();
         }
-        
+
     }
 }
