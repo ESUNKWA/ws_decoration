@@ -17,7 +17,7 @@ class penaliteController extends Controller
      */
     public function index()
     {
-        
+
     }
 
     /**
@@ -39,7 +39,7 @@ class penaliteController extends Controller
     public function store(Request $request)
     {
         $inputs = $request->all();
-        
+
         // Validation des champs
         $errors = [
             'p_mnt'  => 'required',
@@ -61,7 +61,7 @@ class penaliteController extends Controller
             ];
             return $response;
         }else{
-          
+
             $insertion = Penalite::create([
                 'r_location' => $request->p_location,
                 'r_mnt' => $request->p_mnt,
@@ -86,7 +86,7 @@ class penaliteController extends Controller
     public function show($idlocation)
     {
         $listePenalite = Penalite::where('r_location',$idlocation)->get();
-        
+
         try {
             if( count($listePenalite) >= 1 ){
 
@@ -127,7 +127,7 @@ class penaliteController extends Controller
     public function update(Request $request, $idlocation)
     {
         $inputs = $request->all();
-        
+
         // Validation des champs
         $errors = [
             'p_mnt'  => 'required',
@@ -150,9 +150,9 @@ class penaliteController extends Controller
             return $response;
         }else{
           $update = Penalite::find($idlocation);
-          
+
           if( $update !== null ){
-              
+
                 $update->update([
                     'r_mnt' => $request->p_mnt,
                     'r_motif' => $request->p_motif,
@@ -163,16 +163,16 @@ class penaliteController extends Controller
                     '_status' => 1,
                     '_result' => 'Modification effectuée avec succès'
                 ];
-               
+
           }else{
 
                 $response = [
                     '_status' => 0,
                     '_result' => 'Une erreur est survenue lors de l\'enregistrement'
                 ];
-            
+
           }
-                
+
                 return response()->json($response, 200);
         }
     }
