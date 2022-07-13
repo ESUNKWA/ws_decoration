@@ -81,7 +81,7 @@ class utilisateursController extends Controller
                 'r_profil' => $request->p_profil,
                 'r_utilisateur' => $request->p_utilisateur,
                 'r_login' => $request->r_login,
-                'password' => MD5($request->password),
+                'password' => bcrypt($request->password),
                 'r_status'  => 1,
             ]);
             $response = [

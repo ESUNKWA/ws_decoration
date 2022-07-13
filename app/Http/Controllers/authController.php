@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\rc;
 use App\Models\Utilisateurs;
 use Illuminate\Http\Request;
+use App\Models\isUserConnect;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -56,34 +57,38 @@ class authController extends Controller
             return $validate->errors();
         }
         //Récuperation des infos des utilisateurs
-        // $login = DB::table('t_utilisateurs')
-        //             ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
-        //             ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
-        //             ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.r_actif')
-        //             ->where('r_login', $request->p_login)
-        //             ->where('password', MD5($request->p_mdp))
-        //             ->first();
+
         $login = Utilisateurs::join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
                                ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
-                               ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.r_actif')
+                               ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.password')
                                ->where('r_login', $request->p_login)
-                    //->where('password', MD5($request->p_mdp))
                                ->first();
 
-        if( Hash::check($request->p_mdp, $login->password) ){
+        // Vérifier si l'utilisateur est déjà connecté
 
-            $token = $login->createToken('auth_token')->plainTextToken;
+        $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
 
+        if( !$isUserConnect ){
 
-            $response = [
-                '_status' => 1,
-                '_result' => $login,
-                '_access_token' => $token
-            ];
-            return response()->json($response, 200);
-        }else{
-            return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+            if( Hash::check($request->p_mdp, $login->password) ){
+
+                unset($login->password); // Suppression du mot de passe dans le retour de l'API
+
+                $token = $login->createToken('auth_token')->plainTextToken; // Création du token
+
+                $response = [
+                    '_status' => 1,
+                    '_result' => $login,
+                    '_access_token' => $token
+                ];
+                return response()->json($response, 200);
+            }else{
+                return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+            }
+
         }
+
+        return response()->json(['_status'=>1, '_result'=>'Utilisateur dejà connecté!']);
     }
 
     /**
