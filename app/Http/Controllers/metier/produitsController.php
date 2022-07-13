@@ -216,4 +216,6 @@ class produitsController extends Controller
     {
         //
     }
+
+
 }
