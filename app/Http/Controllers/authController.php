@@ -58,11 +58,23 @@ class authController extends Controller
         }
         //Récuperation des infos des utilisateurs
 
-        $login = Utilisateurs::join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
+        try {
+           /*  $login = Utilisateurs::join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
                                ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
                                ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.password')
                                ->where('r_login', $request->p_login)
-                               ->first();
+                               ->first(); */
+
+
+                               $login = DB::table('t_utilisateurs')
+                    ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
+                    ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
+                    ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.r_actif')
+                    ->where('r_login', $request->p_login)
+                    //->where('password', MD5($request->p_mdp))
+                    ->get();
+
+                    return $login;
 
         // Vérifier si l'utilisateur est déjà connecté
 
@@ -78,7 +90,7 @@ class authController extends Controller
 
                 $response = [
                     '_status' => 1,
-                    '_result' => $login,
+                    '_result' => [$login],
                     '_access_token' => $token
                 ];
                 return response()->json($response, 200);
@@ -89,6 +101,9 @@ class authController extends Controller
         }
 
         return response()->json(['_status'=>1, '_result'=>'Utilisateur dejà connecté!']);
+        } catch (\Throwable $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
