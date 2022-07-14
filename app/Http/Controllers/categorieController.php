@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\rc;
 use App\Models\Categories;
 use Illuminate\Http\Request;
+use Nullix\CryptoJsAes\CryptoJsAes;
 use Illuminate\Support\Facades\Validator;
+
+use App\Http\Controllers\dashController;
+
 
 class categorieController extends Controller
 {
@@ -43,7 +47,14 @@ class categorieController extends Controller
      */
     public function store(Request $request)
     {
-        $inputs = $request->all();
+        //Décryptage des données récues
+       $inputs = CryptoJSAES::decrypt($request->p_data,"123456789");
+
+
+       //$ex = new ProfilUtilisatersController();
+
+       //return $ex->index();
+
 
         // Validation des champs
         $errors = [
@@ -59,23 +70,27 @@ class categorieController extends Controller
         $validate = Validator::make($inputs, $errors, $erreurs);
 
         if( $validate->fails()){
-            $response = [
+            return $response = [
                 '_status' =>-100,
                 '_result' => $validate->errors()
             ];
-            return $response;
+           
         }else{
+
             $insertion = Categories::create([
-                'r_libelle' => $request->r_libelle,
-                'r_description' => $request->p_description,
-                'r_utilisateur' => $request->p_utilisateur,
+                'r_libelle' => $inputs['r_libelle'],
+                'r_description' => $inputs['p_description'],
+                'r_utilisateur' => $inputs['p_utilisateur'],
                 'r_status' => 1,
             ]);
 
+            $encryptedreponses = CryptoJSAES::encrypt('La catégorie [ '.$insertion->r_libelle.' ] à bien été enregistrée', "123456789");
+
             $response = [
                 '_status' => 1,
-                '_result' => 'La catégorie [ '.$insertion->r_libelle.' ] à bien été enregistrée'
+                '_result' => json_decode($encryptedreponses, true)
             ];
+
             return response()->json($response, 200);
         }
     }
