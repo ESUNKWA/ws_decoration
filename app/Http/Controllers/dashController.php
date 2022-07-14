@@ -53,7 +53,8 @@ class dashController extends Controller
 
             $mnt_total = DB::select("SELECT loc.r_paiement_echell from t_locations loc where loc.r_paiement_echell <> 'null' ");
 
-    return array_merge([$dash, $LocationStatus, $produitStat,$mnt_total,$a]);
+            return array_merge([$dash, $LocationStatus, $produitStat,$mnt_total,$a]);
+            
         } catch (\Throwable $e) {
             return $e->getMessage();
         }

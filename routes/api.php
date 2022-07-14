@@ -20,6 +20,7 @@ use App\Http\Controllers\metier\PenaliteController;
 
 
 Route::post('login', [authController::class, 'store']);
+//Route::get('dash', [dashController::class, 'index']);
 
 
 Route::group(['middleware' => 'auth:sanctum'], function(){
@@ -58,5 +59,6 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         'penalite' => PenaliteController::class,
 
     ]);
+
 
 });
