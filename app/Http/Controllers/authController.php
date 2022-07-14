@@ -38,7 +38,6 @@ class authController extends Controller
      */
     public function store(Request $request)
     {
-
         // Validation des données
         $errors = [
             'p_login' => 'required',
