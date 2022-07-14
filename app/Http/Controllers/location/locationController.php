@@ -162,9 +162,6 @@ class locationController extends Controller
             return $validator->errors();
         }else{
             $date = date('ym');
-
-
-
                 //Insertion des données du client
                 try {
                     DB::beginTransaction();//Début de la transaction

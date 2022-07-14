@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\rc;
 use App\Models\Utilisateurs;
 use Illuminate\Http\Request;
+use App\Models\isUserConnect;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class authController extends Controller
@@ -55,49 +57,52 @@ class authController extends Controller
             return $validate->errors();
         }
         //Récuperation des infos des utilisateurs
-        $login = DB::table('t_utilisateurs')
+
+        try {
+           /*  $login = Utilisateurs::join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
+                               ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
+                               ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.password')
+                               ->where('r_login', $request->p_login)
+                               ->first(); */
+
+
+                               $login = DB::table('t_utilisateurs')
                     ->join('t_personnels','t_personnels.r_i', '=','t_utilisateurs.r_personnel')
                     ->join('t_profils','t_profils.r_i', '=','t_utilisateurs.r_profil')
                     ->select('t_utilisateurs.r_i','t_utilisateurs.r_login','t_personnels.r_nom','t_personnels.r_prenoms','t_personnels.r_contact','t_profils.r_libelle as profil','t_profils.r_code_profil','t_utilisateurs.r_actif')
                     ->where('r_login', $request->p_login)
-                    ->where('password', MD5($request->p_mdp))
+                    //->where('password', MD5($request->p_mdp))
                     ->get();
 
-        if( count($login) >= 1){
+                    return $login;
 
-            // switch( $login[0]->r_actif ){
+        // Vérifier si l'utilisateur est déjà connecté
 
-            //     case 0:
-            //         $users = Utilisateurs::find($login[0]->r_i);
+        $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
 
-            //         $users->update([
-            //             'r_actif' => 1
-            //         ]);
+        if( !$isUserConnect ){
 
-            //         $response = [
-            //             '_status' => 1,
-            //             '_result' => $login,
-            //         ];
+            if( Hash::check($request->p_mdp, $login->password) ){
 
-            //         break;
+                unset($login->password); // Suppression du mot de passe dans le retour de l'API
 
-            //     case 1:
-            //         $response = [
-            //             '_status' => -100,
-            //             '_result' => "Ce compte est déjà en cours d'utilisation",
-            //         ];
-            //         break;
+                $token = $login->createToken('auth_token')->plainTextToken; // Création du token
 
-            //     default:
-            //         break;
-            // }
-            $response = [
-                '_status' => 1,
-                '_result' => $login
-            ];
-            return response()->json($response, 200);
-        }else{
-            return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+                $response = [
+                    '_status' => 1,
+                    '_result' => [$login],
+                    '_access_token' => $token
+                ];
+                return response()->json($response, 200);
+            }else{
+                return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+            }
+
+        }
+
+        return response()->json(['_status'=>1, '_result'=>'Utilisateur dejà connecté!']);
+        } catch (\Throwable $e) {
+            return $e->getMessage();
         }
     }
 
@@ -148,11 +153,15 @@ class authController extends Controller
 
     public function deconnect(Request $request){
 
-        $users = Utilisateurs::findOrfail($request->idUtilisateur);
+        // $users = Utilisateurs::findOrfail($request->idUtilisateur);
 
-        $users->update([
-                'r_actif' => 0
-        ]);
-        return ($users->r_i)? true : false;
+        // $users->update([
+        //         'r_actif' => 0
+        // ]);
+        // return ($users->r_i)? true : false;
+
+        Utilisateurs::where('r_login', $request->p_login)->first()->tokens()->delete();
+        return 'Vous êtes maintenant déconnecté';
+        //return $this->responseSuccess('Vous êtes maintenant déconnecté');
     }
 }
