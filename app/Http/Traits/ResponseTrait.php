@@ -5,7 +5,11 @@ namespace App\Http\Traits;
  */
 trait ResponseTrait
 {
-    public function responseSuccess(String $message, array $dataRequest){
+    /**
+     * $message
+     * $dataRequest
+     */
+    public function responseSuccess(String $message, $dataRequest){
         $response = [
             '_status' => 1,
             '_message' => $message,

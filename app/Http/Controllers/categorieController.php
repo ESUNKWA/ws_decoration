@@ -10,9 +10,13 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Http\Controllers\dashController;
 
+use App\Http\Traits\cryptTrait;
+use App\Http\Traits\ResponseTrait;
+
 
 class categorieController extends Controller
 {
+    use cryptTrait, ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -22,11 +26,15 @@ class categorieController extends Controller
     {
         $liste_categories = Categories::OrderBy('r_libelle', 'ASC')->get();
 
-        $response = [
+        //$test = CryptoJSAES::encrypt($liste_categories);
+        
+        return $this->responseSuccess('Liste des catégories', $liste_categories);
+
+        /* $response = [
             '_status' => 1,
-            '_result' => $liste_categories,
+            '_result' => $liste_categories, 
         ];
-        return response()->json($response, 200);
+        return response()->json($response, 200); */
     }
 
     /**
@@ -49,7 +57,6 @@ class categorieController extends Controller
     {
         //Décryptage des données récues
        $inputs = CryptoJSAES::decrypt($request->p_data,"123456789");
-
 
        //$ex = new ProfilUtilisatersController();
 
