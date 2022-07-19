@@ -9,9 +9,11 @@ use App\Models\isUserConnect;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Traits\ResponseTrait;
 
 class authController extends Controller
 {
+    use ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -84,7 +86,8 @@ class authController extends Controller
                 ];
                 return response()->json($response, 200);
             }else{
-                return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+                $this->responseCatchError('Login ou Mot de passe incorrecte !');
+                //return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
             }
 
         }
