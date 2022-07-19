@@ -69,8 +69,8 @@ class authController extends Controller
 
         $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
 
-        if( $isUserConnect ){
-
+        if( !$isUserConnect ){
+        
             if( Hash::check($request->p_mdp, $login->password) ){
 
                 unset($login->password); // Suppression du mot de passe dans le retour de l'API
@@ -90,6 +90,7 @@ class authController extends Controller
         }
 
         return response()->json(['_status'=>0, '_result'=>'Utilisateur dejà connecté  !!!']);
+
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
@@ -142,15 +143,15 @@ class authController extends Controller
 
     public function deconnect(Request $request){
 
-        // $users = Utilisateurs::findOrfail($request->idUtilisateur);
+        try {
+            //code...
+            Utilisateurs::where('r_i', $request->p_id)->first()->tokens()->delete();
+           
+            return response()->json(['_status'=>1, '_result'=>'Vous êtes maintenant déconnecté !']);
 
-        // $users->update([
-        //         'r_actif' => 0
-        // ]);
-        // return ($users->r_i)? true : false;
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
 
-        Utilisateurs::where('r_login', $request->p_login)->first()->tokens()->delete();
-        return 'Vous êtes maintenant déconnecté';
-        //return $this->responseSuccess('Vous êtes maintenant déconnecté');
     }
 }
