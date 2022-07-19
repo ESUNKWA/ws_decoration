@@ -67,6 +67,10 @@ class authController extends Controller
                                ->where('r_login', $request->p_login)
                                ->first();
 
+            if (!$login) {
+                return $this->responseCatchError('Login ou Mot de passe incorrecte !');
+            }
+
         // Vérifier si l'utilisateur est déjà connecté
 
         $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
