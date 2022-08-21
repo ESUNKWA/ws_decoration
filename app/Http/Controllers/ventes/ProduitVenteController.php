@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\ventes;
 
-use App\Http\Controllers\Controller;
 use App\Models\c;
 use Illuminate\Http\Request;
+use App\Http\Traits\cryptTrait;
+use App\Http\Traits\ResponseTrait;
+use App\Http\Controllers\Controller;
+use App\Models\VenteProduits\ProduitsVente as Produits;
 
 class ProduitVenteController extends Controller
 {
+    use cryptTrait, ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +19,14 @@ class ProduitVenteController extends Controller
      */
     public function index()
     {
-        //
+        $liste_produits = Produits::OrderBy('r_nom_produit', 'ASC')->get();
+
+        $donnees = $this->responseSuccess('Liste des produits en ventes', json_decode($liste_produits));
+
+        //Cryptage des données avant à envoyer au client
+        //$donneesCryptees = $this->crypt($donnees);
+
+        return $donnees;
     }
 
     /**

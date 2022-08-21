@@ -18,6 +18,7 @@ use App\Http\Controllers\personnel\personnelController;
 use App\Http\Controllers\location\detailsLocationController;
 use App\Http\Controllers\metier\PenaliteController;
 use App\Http\Controllers\ventes\FournisseurController;
+use App\Http\Controllers\ventes\ProduitVenteController;
 
 Route::post('login', [authController::class, 'store']);
 //Route::get('dash', [dashController::class, 'index']);
@@ -59,8 +60,9 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         //Pénalité
         'penalite' => PenaliteController::class,
 
-        //Fournisseur
-        'fournisseurs' => FournisseurController::class
+        //Gestion des ventes
+        'fournisseurs' => FournisseurController::class,
+        'produits_en_ventes' => ProduitVenteController::class,
 
     ]);
 

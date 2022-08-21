@@ -135,7 +135,7 @@ class FournisseurController extends Controller
        $errors = [
            'r_ets'  => 'required',
            'r_nom_fournisseur'  => 'required',
-           'r_contact' => 'required|unique:t_fournisseurs',
+           'r_contact' => 'required',
            'r_produit_fourni' => 'required',
            'r_lieu_de_vente' => 'required',
            'r_creer_par' => 'required',
