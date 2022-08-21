@@ -71,32 +71,32 @@ class authController extends Controller
                 return $this->responseCatchError('Login ou Mot de passe incorrecte !');
             }
 
-        // Vérifier si l'utilisateur est déjà connecté
+            // Vérifier si l'utilisateur est déjà connecté
 
-        $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
+            $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
 
-        if( $isUserConnect ){
+            if( !$isUserConnect ){
 
-            if( Hash::check($request->p_mdp, $login->password) ){
+                if( Hash::check($request->p_mdp, $login->password) ){
 
-                unset($login->password); // Suppression du mot de passe dans le retour de l'API
+                    unset($login->password); // Suppression du mot de passe dans le retour de l'API
 
-                $token = $login->createToken('auth_token')->plainTextToken; // Création du token
+                    $token = $login->createToken('auth_token')->plainTextToken; // Création du token
 
-                $response = [
-                    '_status' => 1,
-                    '_result' => [$login],
-                    '_access_token' => $token
-                ];
-                return response()->json($response, 200);
-            }else{
-                $this->responseCatchError('Login ou Mot de passe incorrecte !');
-                //return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+                    $response = [
+                        '_status' => 1,
+                        '_result' => [$login],
+                        '_access_token' => $token
+                    ];
+                    return response()->json($response, 200);
+                }else{
+                    $this->responseCatchError('Login ou Mot de passe incorrecte !');
+                    //return response()->json(['_status'=>0, '_result'=>'Login ou Mot de passe incorrecte !']);
+                }
+
             }
 
-        }
-
-        return response()->json(['_status'=>0, '_result'=>'Utilisateur dejà connecté  !!!']);
+            return response()->json(['_status'=>0, '_result'=>'Utilisateur dejà connecté  !!!']);
 
         } catch (\Throwable $e) {
             return $e->getMessage();

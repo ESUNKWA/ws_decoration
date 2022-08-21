@@ -17,7 +17,7 @@ use App\Http\Controllers\metier\tarificationController;
 use App\Http\Controllers\personnel\personnelController;
 use App\Http\Controllers\location\detailsLocationController;
 use App\Http\Controllers\metier\PenaliteController;
-
+use App\Http\Controllers\ventes\FournisseurController;
 
 Route::post('login', [authController::class, 'store']);
 //Route::get('dash', [dashController::class, 'index']);
@@ -58,6 +58,9 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
 
         //Pénalité
         'penalite' => PenaliteController::class,
+
+        //Fournisseur
+        'fournisseurs' => FournisseurController::class
 
     ]);
 
