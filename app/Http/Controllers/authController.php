@@ -75,8 +75,8 @@ class authController extends Controller
 
         $isUserConnect = isUserConnect::where('tokenable_id', $login->r_i)->first();
 
-        if( !$isUserConnect ){
-        
+        if( $isUserConnect ){
+
             if( Hash::check($request->p_mdp, $login->password) ){
 
                 unset($login->password); // Suppression du mot de passe dans le retour de l'API
@@ -153,7 +153,7 @@ class authController extends Controller
         try {
             //code...
             Utilisateurs::where('r_i', $request->p_id)->first()->tokens()->delete();
-           
+
             return response()->json(['_status'=>1, '_result'=>'Vous êtes maintenant déconnecté !']);
 
         } catch (\Throwable $th) {

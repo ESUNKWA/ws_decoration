@@ -21,7 +21,11 @@ trait cryptTrait
     /**
      * Décryptage des données
      */
-    public function decrypt($data): string{
-        return CryptoJSAES::decrypt($data,"123456789");
+    public function decryptData($data){
+        try {
+            return CryptoJSAES::decrypt($data,"123456789");
+        } catch (\Throwable $e) {
+            return $e->getMessage();
+        }
     }
 }

@@ -26,15 +26,13 @@ class categorieController extends Controller
     {
         $liste_categories = Categories::OrderBy('r_libelle', 'ASC')->get();
 
-        //$test = CryptoJSAES::encrypt($liste_categories);
-        
-        return $this->responseSuccess('Liste des catégories', $liste_categories);
+        $donnees = $this->responseSuccess('Liste des catégories', json_decode($liste_categories));
 
-        /* $response = [
-            '_status' => 1,
-            '_result' => $liste_categories, 
-        ];
-        return response()->json($response, 200); */
+        //Cryptage des données avant à envoyer au client
+        $donneesCryptees = $this->crypt($donnees);
+
+        return $donneesCryptees;
+
     }
 
     /**
@@ -56,12 +54,7 @@ class categorieController extends Controller
     public function store(Request $request)
     {
         //Décryptage des données récues
-       $inputs = CryptoJSAES::decrypt($request->p_data,"123456789");
-
-       //$ex = new ProfilUtilisatersController();
-
-       //return $ex->index();
-
+       $inputs = $this->decryptData($request->p_data);
 
         // Validation des champs
         $errors = [
@@ -77,28 +70,26 @@ class categorieController extends Controller
         $validate = Validator::make($inputs, $errors, $erreurs);
 
         if( $validate->fails()){
-            return $response = [
-                '_status' =>-100,
-                '_result' => $validate->errors()
-            ];
-           
+            return $this->responseCatchError($validate->errors());
         }else{
 
-            $insertion = Categories::create([
-                'r_libelle' => $inputs['r_libelle'],
-                'r_description' => $inputs['p_description'],
-                'r_utilisateur' => $inputs['p_utilisateur'],
-                'r_status' => 1,
-            ]);
+            try {
+                
+                $insertion = Categories::create([
+                    'r_libelle' => $inputs['r_libelle'],
+                    'r_description' => $inputs['p_description'],
+                    'r_utilisateur' => $inputs['p_utilisateur'],
+                    'r_status' => 1,
+                ]);
+    
+                $response = $this->crypt('La catégorie [ '.$insertion->r_libelle.' ] à bien été enregistrée');
+                
+                return $this->responseSuccess($response);
 
-            $encryptedreponses = CryptoJSAES::encrypt('La catégorie [ '.$insertion->r_libelle.' ] à bien été enregistrée', "123456789");
+            } catch (\Throwable $e) {
+                return $this->responseCatchError($e->getMessage());
+            }
 
-            $response = [
-                '_status' => 1,
-                '_result' => json_decode($encryptedreponses, true)
-            ];
-
-            return response()->json($response, 200);
         }
     }
 

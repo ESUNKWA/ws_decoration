@@ -9,7 +9,7 @@ trait ResponseTrait
      * $message
      * $dataRequest
      */
-    public function responseSuccess(String $message, $dataRequest){
+    public function responseSuccess(String $message, $dataRequest = null){
         $response = [
             '_status' => 1,
             '_message' => $message,

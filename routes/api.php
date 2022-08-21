@@ -37,7 +37,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('paymentpartiel', [locationController::class, 'add_payment']);
     Route::post('tarification_cibles', [tarificationController::class, 'tarification_cibles']);
     Route::post('updatelocation', [locationController::class, 'modif_location']);
-    
+
     Route::resources([
         'profils'    => ProfilUtilisatersController::class,
         'utilisateurs'   => utilisateursController::class,
@@ -55,10 +55,10 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         'personnel' => personnelController::class,
         //Client
         'clients' => clientController::class,
-    
+
         //Pénalité
         'penalite' => PenaliteController::class,
-    
+
     ]);
-    
+
 });
