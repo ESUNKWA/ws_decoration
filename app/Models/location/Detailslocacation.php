@@ -11,5 +11,6 @@ class Detailslocacation extends Model
     protected $primaryKey = 'r_i';
     protected $table = 't_details_locations';
     protected $fillable = ['r_i','r_quantite','r_status','r_description','r_produit',
-                            'r_location','r_sous_total','r_utilisateur','r_produit_manquant','r_prix_location'];
+                            'r_location','r_sous_total','r_utilisateur','r_produit_manquant',
+                            'r_prix_location'];
 }

@@ -19,6 +19,7 @@ use App\Http\Controllers\location\detailsLocationController;
 use App\Http\Controllers\metier\PenaliteController;
 use App\Http\Controllers\ventes\FournisseurController;
 use App\Http\Controllers\ventes\ProduitVenteController;
+use App\Http\Controllers\ventes\VenteProduitController;
 
 Route::post('login', [authController::class, 'store']);
 //Route::get('dash', [dashController::class, 'index']);
@@ -63,6 +64,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         //Gestion des ventes
         'fournisseurs' => FournisseurController::class,
         'produits_en_ventes' => ProduitVenteController::class,
+        'ventes' => VenteProduitController::class,
 
     ]);
 
