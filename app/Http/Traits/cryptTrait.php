@@ -9,7 +9,7 @@ trait cryptTrait
     /**
      * cryptage des données
      */
-    public function crypt($data): string{
+    public function crypt($data){
         try {
             return CryptoJSAES::encrypt($data, "123456789");
         } catch (\Throwable $th) {

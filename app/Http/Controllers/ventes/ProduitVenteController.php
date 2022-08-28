@@ -9,6 +9,7 @@ use App\Http\Traits\ResponseTrait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Models\VenteProduits\ProduitsVente as Produits;
+use App\Models\VenteProduits\AchatArticle;
 
 class ProduitVenteController extends Controller
 {
@@ -25,9 +26,9 @@ class ProduitVenteController extends Controller
         $donnees = $this->responseSuccess('Liste des produits en ventes', json_decode($liste_produits));
 
         //Cryptage des données avant à envoyer au client
-        //$donneesCryptees = $this->crypt($donnees);
+        $donneesCryptees = $this->crypt($donnees);
 
-        return $donnees;
+        return $donneesCryptees;
     }
 
     /**
@@ -48,21 +49,20 @@ class ProduitVenteController extends Controller
      */
     public function store(Request $request)
     {
+
         //Décryptage des données récues
-       //$inputs = $this->decryptData($request->p_data);
-       $inputs = $request->p_data;
+       $inputs = $this->decryptData($request->p_data);
+        //return $inputs;
 
        // Validation des champs
        $errors = [
            'r_nom_produit'  => 'required|unique:t_produitventes',
            'r_creer_par' => 'required',
-           'r_modifier_par' => 'required',
        ];
        $erreurs = [
            'r_nom_produit.required' =>'Le nom du produit est obligatoire',
            'r_nom_produit.unique' =>'Le nom du produit existe dejà',
            'r_creer_par.required'  => 'Utilisateur obligatoire',
-           'r_modifier_par.required'  => 'Utilisateur obligatoire'
        ];
 
        $validate = Validator::make($inputs, $errors, $erreurs);
@@ -117,18 +117,16 @@ class ProduitVenteController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        //$inputs = $this->decryptData($request->p_data);
-       $inputs = $request->p_data;
+        $inputs = $this->decryptData($request->p_data);
+       //return $inputs;
 
        // Validation des champs
        $errors = [
         'r_nom_produit'  => 'required',
-        'r_creer_par' => 'required',
         'r_modifier_par' => 'required',
         ];
         $erreurs = [
             'r_nom_produit.required' =>'Le nom du produit est obligatoire',
-            'r_creer_par.required'  => 'Utilisateur obligatoire',
             'r_modifier_par.required'  => 'Utilisateur obligatoire'
         ];
 
@@ -146,11 +144,15 @@ class ProduitVenteController extends Controller
 
             $update->update($inputs);
 
-            $response = [
+            /* $response = [
                 '_status' => 1,
                 '_result' => 'Le produit [ '.$update->r_nom_produit.' ] à bien été modifiée'
             ];
-            return response()->json($response, 200);
+            return response()->json($response, 200); */
+
+            $response = $this->crypt($this->responseSuccess('Modification éffectuée avec succès'));
+
+               return $response;
         }
     }
 
@@ -163,5 +165,42 @@ class ProduitVenteController extends Controller
     public function destroy(c $c)
     {
         //
+    }
+
+    public function achat_produit( Request $request ){
+
+       //$datacrypt = $this->crypt($request->all());
+       //return $datacrypt;
+       //Décryptage des données récues
+       $inputs = $this->decryptData(json_encode($request->p_data));
+       //return $inputs;
+
+      // Validation des champs
+      $errors = [
+          'r_produit'  => 'required',
+      ];
+      $erreurs = [
+          'r_produit.required' =>'Le nom du produit est obligatoire'
+      ];
+
+      $validate = Validator::make($inputs, $errors, $erreurs);
+
+      if( $validate->fails()){
+          return $this->responseCatchError($validate->errors());
+      }else{
+
+          try {
+
+              $insertion = AchatArticle::create($inputs);
+
+              $response = $this->crypt('Enregistrement effecrué avec succès');
+
+              return $this->responseSuccess($response);
+
+          } catch (\Throwable $e) {
+              return $this->responseCatchError($e->getMessage());
+          }
+
+      }
     }
 }

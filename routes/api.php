@@ -40,6 +40,9 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('tarification_cibles', [tarificationController::class, 'tarification_cibles']);
     Route::post('updatelocation', [locationController::class, 'modif_location']);
 
+
+    Route::post('achat', [ProduitVenteController::class, 'achat_produit']);
+
     Route::resources([
         'profils'    => ProfilUtilisatersController::class,
         'utilisateurs'   => utilisateursController::class,
@@ -67,5 +70,7 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         'ventes' => VenteProduitController::class,
 
     ]);
+
+
 
 });

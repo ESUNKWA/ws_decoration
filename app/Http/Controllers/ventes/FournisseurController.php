@@ -26,9 +26,9 @@ class FournisseurController extends Controller
         $donnees = $this->responseSuccess('Liste des fournisseurs', json_decode($liste_fournisseurs));
 
         //Cryptage des données avant à envoyer au client
-        //$donneesCryptees = $this->crypt($donnees);
+        $donneesCryptees = $this->crypt($donnees);
 
-        return $donnees;
+        return $donneesCryptees;
     }
 
     /**
@@ -49,10 +49,11 @@ class FournisseurController extends Controller
      */
     public function store(Request $request)
     {
-
+        //$crypt = $this->crypt($request->all());
+        //return $crypt;
         //Décryptage des données récues
-       //$inputs = $this->decryptData($request->p_data);
-       $inputs = $request->p_data;
+       $inputs = $this->decryptData(json_encode($request->all()));
+       return $inputs;
 
         // Validation des champs
         $errors = [

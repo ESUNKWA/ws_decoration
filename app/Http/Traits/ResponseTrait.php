@@ -25,4 +25,4 @@ trait ResponseTrait
         ];
         return response()->json($response)  ;
     }
-} 
+}
