@@ -41,7 +41,10 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::post('updatelocation', [locationController::class, 'modif_location']);
 
 
-    Route::post('achat', [ProduitVenteController::class, 'achat_produit']);
+    Route::get('list_achat_articles', [ProduitVenteController::class,'list_achat']);
+    Route::post('achat_article', [ProduitVenteController::class, 'achat_produit']);
+    Route::put('update_achat/{id}', [ProduitVenteController::class, 'update_achat']);
+
 
     Route::resources([
         'profils'    => ProfilUtilisatersController::class,
@@ -70,6 +73,8 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
         'ventes' => VenteProduitController::class,
 
     ]);
+
+
 
 
 

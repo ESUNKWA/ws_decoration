@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\location\client;
 use App\Models\VenteProduits\DetailVentes;
+use App\Models\VenteProduits\ProduitsVente;
 use Illuminate\Support\Facades\Validator;
 use App\Models\VenteProduits\VenteProduits;
 
@@ -23,7 +24,13 @@ class VenteProduitController extends Controller
      */
     public function index()
     {
-        //
+        $listProduits = ProduitsVente::orderBy('r_nom_produit', 'asc')->get();
+
+        $donnees = $this->responseSuccess('Liste des produits en ventes', json_decode($listProduits));
+
+        //Cryptage des données avant à envoyer au client
+        $donneesCryptees = $this->crypt($donnees);
+        return $donneesCryptees;
     }
 
     /**

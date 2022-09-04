@@ -20,7 +20,7 @@ trait ResponseTrait
 
     public function responseCatchError(String $message){
         $response = [
-            '_status' => 1,
+            '_status' => 0,
             '_error' => $message
         ];
         return response()->json($response)  ;

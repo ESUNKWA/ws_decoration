@@ -12,6 +12,7 @@ class ProduitsVente extends Model
     protected $fillable = [
         'r_nom_produit',
         'r_stock',
+        'r_prix_vente',
         'r_description',
         'r_creer_par',
         'r_modifier_par'

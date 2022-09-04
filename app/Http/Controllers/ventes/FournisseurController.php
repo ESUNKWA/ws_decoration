@@ -52,8 +52,9 @@ class FournisseurController extends Controller
         //$crypt = $this->crypt($request->all());
         //return $crypt;
         //Décryptage des données récues
-       $inputs = $this->decryptData(json_encode($request->all()));
-       return $inputs;
+
+       $inputs = $this->decryptData($request->p_data);
+       //return $inputs;
 
         // Validation des champs
         $errors = [
@@ -62,8 +63,7 @@ class FournisseurController extends Controller
             'r_contact' => 'required|unique:t_fournisseurs',
             'r_produit_fourni' => 'required',
             'r_lieu_de_vente' => 'required',
-            'r_creer_par' => 'required',
-            'r_modifier_par' => 'required',
+            'r_creer_par' => 'required'
         ];
         $erreurs = [
             'r_ets.required' =>'Le nom de l\'établissement est obligatoire',
@@ -73,8 +73,7 @@ class FournisseurController extends Controller
             'r_contact.unique' =>'Numéro de téléphone dejà existant',
             'r_produit_fourni.required' =>'Veuillez saisir les produits fournis',
             'r_lieu_de_vente.required'  => 'Veuillez préciser le siège du fournisseur',
-            'r_creer_par.required'  => 'Utilisateur obligatoire',
-            'r_modifier_par.required'  => 'Utilisateur obligatoire'
+            'r_creer_par.required'  => 'Utilisateur obligatoire'
         ];
 
         $validate = Validator::make($inputs, $errors, $erreurs);
@@ -129,8 +128,8 @@ class FournisseurController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        //$inputs = $this->decryptData($request->p_data);
-       $inputs = $request->p_data;
+        $inputs = $this->decryptData($request->p_data);
+       //$inputs = $request->p_data;
 
        // Validation des champs
        $errors = [
@@ -139,7 +138,6 @@ class FournisseurController extends Controller
            'r_contact' => 'required',
            'r_produit_fourni' => 'required',
            'r_lieu_de_vente' => 'required',
-           'r_creer_par' => 'required',
            'r_modifier_par' => 'required',
        ];
        $erreurs = [
@@ -150,7 +148,6 @@ class FournisseurController extends Controller
            'r_contact.unique' =>'Numéro de téléphone dejà existant',
            'r_produit_fourni.required' =>'Veuillez saisir les produits fournis',
            'r_lieu_de_vente.required'  => 'Veuillez préciser le siège du fournisseur',
-           'r_creer_par.required'  => 'Utilisateur obligatoire',
            'r_modifier_par.required'  => 'Utilisateur obligatoire'
        ];
 
@@ -168,11 +165,9 @@ class FournisseurController extends Controller
 
             $update->update($inputs);
 
-            $response = [
-                '_status' => 1,
-                '_result' => 'Le fournisseur [ '.$update->r_ets.' ] à bien été modifiée'
-            ];
-            return response()->json($response, 200);
+            $response = $this->crypt($this->responseSuccess('Modification éffectuée avec succès'));
+
+               return $response;
         }
     }
 

@@ -8,9 +8,12 @@ use App\Models\metier\Produits;
 use App\Models\metier\Achatproduit;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Traits\cryptTrait;
+use App\Http\Traits\ResponseTrait;
 
 class produitsController extends Controller
 {
+    use cryptTrait, ResponseTrait;
     /**
      * Display a listing of the resource.
      *
@@ -19,11 +22,13 @@ class produitsController extends Controller
     public function index()
     {
         $liste_produits = Produits::orderBy('r_libelle','ASC')->get();
-        $response = [
-            '_status' =>1,
-            '_result' => $liste_produits
-        ];
-        return response()->json($response, 200);
+
+        $donnees = $this->responseSuccess('Liste des produits', json_decode($liste_produits));
+
+        //Cryptage des données avant à envoyer au client
+        $donneesCryptees = $this->crypt($donnees);
+
+        return $donneesCryptees;
     }
 
     /**
