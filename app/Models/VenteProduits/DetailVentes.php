@@ -11,7 +11,7 @@ class DetailVentes extends Model
     protected $table = 't_details_ventes';
     protected $fillable = [
         'r_quantite',
-        'r_prix_unitaire',
+        'r_prix_vente',
         'r_creer_par',
         'r_modifier_par',
         'r_produit',

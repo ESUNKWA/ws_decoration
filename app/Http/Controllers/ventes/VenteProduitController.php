@@ -24,13 +24,7 @@ class VenteProduitController extends Controller
      */
     public function index()
     {
-        $listProduits = ProduitsVente::orderBy('r_nom_produit', 'asc')->get();
 
-        $donnees = $this->responseSuccess('Liste des produits en ventes', json_decode($listProduits));
-
-        //Cryptage des données avant à envoyer au client
-        $donneesCryptees = $this->crypt($donnees);
-        return $donneesCryptees;
     }
 
     /**
@@ -54,18 +48,17 @@ class VenteProduitController extends Controller
         //Décryptage des données récues
        //$inputs = $this->decryptData($request->p_data);
 
-
-
-       $inputs = $request->p_data;
+       //$inputs = $request->p_data;
+       $inputs = $request->all();
 
        // Validation des champs
        $errors = [
-           'p_ventes'  => 'required',
-           'r_details' => 'required'
+           'p_vente'  => 'required',
+           'p_details' => 'required'
        ];
        $erreurs = [
            'p_ventes.required' =>'Le montant total est obligatoire',
-           'r_details.required' =>'Veuillez selectionner les produits de l\'achat'
+           'p_details.required' =>'Veuillez selectionner les produits de l\'achat'
        ];
 
        $validate = Validator::make($inputs, $errors, $erreurs);
@@ -84,15 +77,35 @@ class VenteProduitController extends Controller
                 $insertionClient = client::create($inputs['p_client']);
 
                 //Insertion des données dans t_ventes
-                $inputs['p_ventes']['r_reference'] = ($insertionClient->r_i < 9 )? $date.'0'.$insertionClient->r_i : $date.$insertionClient->r_i;
-               $insertion = VenteProduits::create($inputs['p_ventes']);
+                $inputs['p_vente']['r_reference'] = ($insertionClient->r_i < 9 )? $date.'0'.$insertionClient->r_i : $date.$insertionClient->r_i;
+               $insertion = VenteProduits::create($inputs['p_vente']);
 
                if( $insertion ){
 
-                foreach ($inputs['r_details'] as $value) {
+                foreach ($inputs['p_details'] as $value) {
                     //Insertion des données dans t_details_ventes
-                    $value['r_vente'] = $insertion->id;
-                    DetailVentes::create($value);
+                    //$value['r_vente'] = $insertion->id;
+                    DetailVentes::create([
+                        'r_produit' => $value['id'],
+                        'r_quantite' => $value['r_quantite'],
+                        'r_prix_vente' => $value['r_prix_vente'],
+                        'r_sous_total' => $value['r_sous_total'],
+                        'r_vente' => $insertion->id,
+                        'r_creer_par' => $inputs['p_client']['r_utilisateur'],
+                    ]);
+                }
+
+                //Mise à jour des stock;
+                foreach ($inputs['p_details'] as  $value) {
+
+                    $check = ProduitsVente::find($value['id']);
+
+                    if( $check ){
+                        $check->update([
+                            'r_stock' => $check->r_stock - $value['r_quantite']
+                        ]);
+                    }
+
                 }
 
                 DB::commit();
@@ -162,9 +175,27 @@ class VenteProduitController extends Controller
         //
     }
 
-    public function vente_produits(Request $request){
+    public function ventes_par_periode($datedebut, $datefin){
 
+        $vente = VenteProduits::whereBetween('created_at', [$datedebut, $datefin] )->get();
 
+        $donnees = $this->responseSuccess('Liste des ventes', $vente);
+
+        //Cryptage des données avant à envoyer au client
+        $donneesCryptees = $this->crypt($donnees);
+        return $donneesCryptees;
+
+    }
+
+    public function details_ventes(int $idvente){
+
+        $detailsVente = DetailVentes::orderBy('t_details_ventes.created_at', 'DESC')
+                                    ->select('t_produitventes.r_nom_produit', 't_details_ventes.*')
+                                    ->join('t_produitventes', 't_details_ventes.r_produit', '=', 't_produitventes.id')
+                                    ->where('r_vente', $idvente)
+                                    ->get();
+
+        return $detailsVente;
 
     }
 }

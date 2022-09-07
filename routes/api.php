@@ -46,6 +46,10 @@ Route::group(['middleware' => 'auth:sanctum'], function(){
     Route::put('update_achat/{id}', [ProduitVenteController::class, 'update_achat']);
 
 
+    Route::get('ventes_par_periode/{datedebut}/{datefin}', [VenteProduitController::class, 'ventes_par_periode']);
+    Route::get('details_ventes/{idvente}', [VenteProduitController::class, 'details_ventes']);
+
+
     Route::resources([
         'profils'    => ProfilUtilisatersController::class,
         'utilisateurs'   => utilisateursController::class,
